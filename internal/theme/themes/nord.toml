@@ -1,0 +1,16 @@
+name = "nord"
+
+[colors]
+line1_bg        = "#2e3440"
+line2_bg        = "#2e3440"
+line3_bg        = "#3b4252"
+identity_accent = "#88c0d0"
+identity_text   = "#d8dee9"
+text_primary    = "#eceff4"
+text_secondary  = "#d8dee9"
+success         = "#a3be8c"
+warning         = "#ebcb8b"
+danger          = "#bf616a"
+info            = "#81a1c1"
+muted           = "#4c566a"
+track_dim       = "#434c5e"

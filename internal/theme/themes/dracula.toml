@@ -1,0 +1,16 @@
+name = "dracula"
+
+[colors]
+line1_bg        = "#282a36"
+line2_bg        = "#282a36"
+line3_bg        = "#44475a"
+identity_accent = "#ff79c6"
+identity_text   = "#f8f8f2"
+text_primary    = "#f8f8f2"
+text_secondary  = "#bd93f9"
+success         = "#50fa7b"
+warning         = "#f1fa8c"
+danger          = "#ff5555"
+info            = "#8be9fd"
+muted           = "#6272a4"
+track_dim       = "#414458"

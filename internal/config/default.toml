@@ -1,0 +1,25 @@
+theme = "gruvbox"
+nerd_font = true
+
+[separator]
+style = "rounded"
+
+[[lines]]
+enabled = true
+segments = ["model", "directory"]
+
+[[lines]]
+enabled = true
+segments = ["git", "pr"]
+
+[[lines]]
+enabled = true
+segments = ["context_window", "cost", "ratelimit_5h", "ratelimit_7d", "vim", "agent", "effort", "output_style"]
+
+[git]
+enabled = true
+timeout_ms = 120
+cache_ttl_ms = 2000
+
+[budget]
+total_timeout_ms = 200

@@ -1,0 +1,5 @@
+/statusline
+/dist/
+*.test
+*.out
+coverage.txt

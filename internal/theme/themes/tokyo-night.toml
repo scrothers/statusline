@@ -1,0 +1,16 @@
+name = "tokyo-night"
+
+[colors]
+line1_bg        = "#1a1b26"
+line2_bg        = "#1a1b26"
+line3_bg        = "#292e42"
+identity_accent = "#bb9af7"
+identity_text   = "#a9b1d6"
+text_primary    = "#c0caf5"
+text_secondary  = "#a9b1d6"
+success         = "#9ece6a"
+warning         = "#e0af68"
+danger          = "#f7768e"
+info            = "#7aa2f7"
+muted           = "#565f89"
+track_dim       = "#3b4261"
