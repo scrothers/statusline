@@ -143,13 +143,16 @@ stays a plain muted color.
 `lines_changed` leads with a pencil icon (given two trailing spaces of its
 own, since its glyph reads tight against a following icon), then
 diff-added/diff-removed icons that alone carry the +/- meaning. `token_counts`
-leads with a ticket icon (same two-space treatment) and breaks down the most
-recent API response's usage into four counts, each behind its own icon: an
-inbound tray for input tokens, an outbound tray for output tokens, a
-database-plus for cache-creation tokens, and the same cache icon used
-elsewhere for cache-read tokens. All four come from that one response, so
-they share a single time scope rather than mixing session totals with a
-per-response cache breakdown. In both segments, only the icons carry
+leads with a ticket icon (same two-space treatment) and breaks down usage
+into four counts, each behind its own icon: an inbound tray for input
+tokens, an outbound tray for output tokens, a database-plus for
+cache-creation tokens, and the same cache icon used elsewhere for
+cache-read tokens. Input/output are session-cumulative totals — the same
+time scope as `lines_changed`'s add/remove counts — while cache-creation/
+cache-read come from the most recent API response, since the schema has no
+cumulative field for either and "how well is caching working right now" is
+inherently a per-turn question anyway (the same time scope the standalone
+`cache` segment already uses). In both segments, only the icons carry
 semantic color (green/red for add-remove and input-output, info for the
 cache pair); the counts themselves are always the theme's secondary text
 color, with no ASCII sign.

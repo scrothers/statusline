@@ -5,13 +5,16 @@ import (
 	"github.com/scrothers/statusline/internal/theme"
 )
 
-// tokenCountsSegment renders the most recent API response's token usage
-// breakdown — input, output, cache-creation, and cache-read counts — behind
-// a ticket icon. All four numbers come from the same response so they share
-// one time scope. Each category's icon carries its own color; the counts
-// themselves are plain numbers in the theme's secondary text color, with no
-// per-category ASCII sign. Omitted when there's no usage data yet, or every
-// category is zero.
+// tokenCountsSegment renders a token usage breakdown behind a ticket icon:
+// input/output are session-cumulative totals (how much conversation there
+// is so far, the same time scope as lines_changed's cumulative add/remove
+// counts), while cache-creation/cache-read are from the most recent API
+// response (there's no cumulative field for either in the schema, and "how
+// well is caching working right now" is inherently a per-turn question
+// anyway — the same time scope the sibling cache segment already uses).
+// Each category's icon carries its own color; the counts themselves are
+// plain numbers in the theme's secondary text color, with no per-category
+// ASCII sign. Omitted when there's no usage data at all.
 type tokenCountsSegment struct{}
 
 func (tokenCountsSegment) ID() string { return "token_counts" }
@@ -20,12 +23,16 @@ func (tokenCountsSegment) Priority() int { return 50 }
 
 func (tokenCountsSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	cw := rc.Payload.ContextWindow
-	if cw == nil || cw.CurrentUsage == nil {
+	if cw == nil {
 		return nil, false
 	}
 
-	u := cw.CurrentUsage
-	if u.InputTokens == 0 && u.OutputTokens == 0 && u.CacheCreationInputTokens == 0 && u.CacheReadInputTokens == 0 {
+	var cacheCreate, cacheRead int
+	if cw.CurrentUsage != nil {
+		cacheCreate = cw.CurrentUsage.CacheCreationInputTokens
+		cacheRead = cw.CurrentUsage.CacheReadInputTokens
+	}
+	if cw.TotalInputTokens == 0 && cw.TotalOutputTokens == 0 && cacheCreate == 0 && cacheRead == 0 {
 		return nil, false
 	}
 
@@ -40,10 +47,10 @@ func (tokenCountsSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 		color   style.Color
 		count   int
 	}{
-		{theme.IconTokensInput, rc.Theme.Success, u.InputTokens},
-		{theme.IconTokensOutput, rc.Theme.Danger, u.OutputTokens},
-		{theme.IconTokensCacheCreate, rc.Theme.Info, u.CacheCreationInputTokens},
-		{theme.IconCache, rc.Theme.Info, u.CacheReadInputTokens},
+		{theme.IconTokensInput, rc.Theme.Success, cw.TotalInputTokens},
+		{theme.IconTokensOutput, rc.Theme.Danger, cw.TotalOutputTokens},
+		{theme.IconTokensCacheCreate, rc.Theme.Info, cacheCreate},
+		{theme.IconCache, rc.Theme.Info, cacheRead},
 	} {
 		if part.count == 0 {
 			continue

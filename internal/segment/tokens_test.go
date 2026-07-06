@@ -19,17 +19,9 @@ func TestTokenCountsSegment(t *testing.T) {
 		}
 	})
 
-	t.Run("absent current usage is omitted", func(t *testing.T) {
-		t.Parallel()
-		rc := newTestContext(t, &input.Payload{ContextWindow: &input.ContextWindow{}}, nil)
-		if _, ok := (tokenCountsSegment{}).Render(rc); ok {
-			t.Error("Render() ok = true, want false for nil CurrentUsage")
-		}
-	})
-
 	t.Run("all-zero usage is omitted", func(t *testing.T) {
 		t.Parallel()
-		rc := newTestContext(t, &input.Payload{ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{}}}, nil)
+		rc := newTestContext(t, &input.Payload{ContextWindow: &input.ContextWindow{}}, nil)
 		if _, ok := (tokenCountsSegment{}).Render(rc); ok {
 			t.Error("Render() ok = true, want false when every category is zero")
 		}
@@ -38,12 +30,14 @@ func TestTokenCountsSegment(t *testing.T) {
 	t.Run("renders all four categories with no ASCII sign", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
-			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{
-				InputTokens:              20_000,
-				OutputTokens:             8_200,
-				CacheCreationInputTokens: 4_000,
-				CacheReadInputTokens:     108_000,
-			}},
+			ContextWindow: &input.ContextWindow{
+				TotalInputTokens:  20_000,
+				TotalOutputTokens: 8_200,
+				CurrentUsage: &input.Usage{
+					CacheCreationInputTokens: 4_000,
+					CacheReadInputTokens:     108_000,
+				},
+			},
 		}, nil)
 		chunks, ok := (tokenCountsSegment{}).Render(rc)
 		if !ok {
@@ -60,10 +54,25 @@ func TestTokenCountsSegment(t *testing.T) {
 		}
 	})
 
+	t.Run("input/output are session-cumulative even with no CurrentUsage", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{
+			ContextWindow: &input.ContextWindow{TotalInputTokens: 818_800, TotalOutputTokens: 12_300},
+		}, nil)
+		chunks, ok := (tokenCountsSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		text := chunkText(chunks)
+		if !strings.Contains(text, "818.8k") || !strings.Contains(text, "12.3k") {
+			t.Errorf("rendered text = %q, want it to contain 818.8k and 12.3k", text)
+		}
+	})
+
 	t.Run("leads with the ticket icon in warning color", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
-			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{InputTokens: 500}},
+			ContextWindow: &input.ContextWindow{TotalInputTokens: 500},
 		}, nil)
 		chunks, ok := (tokenCountsSegment{}).Render(rc)
 		if !ok {
@@ -80,7 +89,7 @@ func TestTokenCountsSegment(t *testing.T) {
 	t.Run("ticket icon has two trailing spaces for breathing room", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
-			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{InputTokens: 500}},
+			ContextWindow: &input.ContextWindow{TotalInputTokens: 500},
 		}, nil)
 		chunks, ok := (tokenCountsSegment{}).Render(rc)
 		if !ok {
@@ -94,12 +103,14 @@ func TestTokenCountsSegment(t *testing.T) {
 	t.Run("each category icon carries its own color, counts use secondary text color", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
-			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{
-				InputTokens:              20_000,
-				OutputTokens:             8_200,
-				CacheCreationInputTokens: 4_000,
-				CacheReadInputTokens:     108_000,
-			}},
+			ContextWindow: &input.ContextWindow{
+				TotalInputTokens:  20_000,
+				TotalOutputTokens: 8_200,
+				CurrentUsage: &input.Usage{
+					CacheCreationInputTokens: 4_000,
+					CacheReadInputTokens:     108_000,
+				},
+			},
 		}, nil)
 		chunks, ok := (tokenCountsSegment{}).Render(rc)
 		if !ok {
@@ -133,7 +144,9 @@ func TestTokenCountsSegment(t *testing.T) {
 	t.Run("renders only the categories present", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
-			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{CacheReadInputTokens: 250}},
+			ContextWindow: &input.ContextWindow{
+				CurrentUsage: &input.Usage{CacheReadInputTokens: 250},
+			},
 		}, nil)
 		chunks, ok := (tokenCountsSegment{}).Render(rc)
 		if !ok {
