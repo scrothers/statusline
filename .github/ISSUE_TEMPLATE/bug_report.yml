@@ -1,0 +1,60 @@
+name: Bug report
+description: Something in statusline isn't rendering or behaving correctly
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report a bug. For security
+        vulnerabilities, please use [private vulnerability reporting](https://github.com/scrothers/statusline/security/advisories/new)
+        instead of a public issue.
+
+  - type: input
+    id: version
+    attributes:
+      label: statusline version
+      description: Output of `statusline --version`
+      placeholder: "statusline v0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: What did you expect, and what did you see instead?
+    validations:
+      required: true
+
+  - type: textarea
+    id: payload
+    attributes:
+      label: Input JSON (if applicable)
+      description: >
+        The Claude Code statusLine JSON payload that triggered the issue,
+        if you have it (redact anything sensitive like paths/tokens).
+      render: json
+
+  - type: textarea
+    id: config
+    attributes:
+      label: Config file (if applicable)
+      description: Your `statusline-config.toml`, if you're using one.
+      render: toml
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?

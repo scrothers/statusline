@@ -1,0 +1,24 @@
+name: Feature request
+description: Suggest a new segment, theme, or config option
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What are you trying to see in your statusline that you can't today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: >
+        A new segment, a config option, a theme — whatever shape you think
+        this should take. Mockups/example renders welcome.
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
