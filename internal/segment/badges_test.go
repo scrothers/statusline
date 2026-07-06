@@ -44,6 +44,39 @@ func TestPRSegment(t *testing.T) {
 			}
 		})
 	}
+
+	t.Run("number uses a neutral identity color, not the review-state color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{PR: &input.PR{Number: 42, ReviewState: "approved"}}, nil)
+		chunks, ok := (prSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) < 2 {
+			t.Fatal("Render() produced fewer than 2 chunks")
+		}
+		if chunks[1].FG != rc.Theme.IdentityText {
+			t.Errorf("number FG = %+v, want theme.IdentityText %+v", chunks[1].FG, rc.Theme.IdentityText)
+		}
+		if chunks[1].FG == rc.Theme.Success {
+			t.Errorf("number FG = %+v, should not equal the review-state color", chunks[1].FG)
+		}
+	})
+
+	t.Run("review-state word still shares the review-state color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{PR: &input.PR{Number: 42, ReviewState: "approved"}}, nil)
+		chunks, ok := (prSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) != 3 {
+			t.Fatalf("Render() produced %d chunks, want 3 (icon, number, word)", len(chunks))
+		}
+		if chunks[2].FG != rc.Theme.Success {
+			t.Errorf("word FG = %+v, want theme.Success %+v", chunks[2].FG, rc.Theme.Success)
+		}
+	})
 }
 
 func TestVimSegment(t *testing.T) {

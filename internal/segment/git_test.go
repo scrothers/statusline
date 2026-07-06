@@ -57,6 +57,58 @@ func TestGitSegment(t *testing.T) {
 		}
 	})
 
+	t.Run("branch name uses identity text color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{}, &gitstatus.Status{Branch: "main"})
+		chunks, ok := (gitSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) < 2 {
+			t.Fatal("Render() produced fewer than 2 chunks")
+		}
+		if chunks[1].FG != rc.Theme.IdentityText {
+			t.Errorf("branch name FG = %+v, want theme.IdentityText %+v", chunks[1].FG, rc.Theme.IdentityText)
+		}
+	})
+
+	t.Run("badge icon carries category color, count uses secondary text color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{}, &gitstatus.Status{Branch: "main", Staged: 2})
+		chunks, ok := (gitSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) != 4 {
+			t.Fatalf("Render() produced %d chunks, want 4 (branch icon, branch name, staged icon, staged count)", len(chunks))
+		}
+		if chunks[2].FG != rc.Theme.Success {
+			t.Errorf("staged icon FG = %+v, want theme.Success %+v", chunks[2].FG, rc.Theme.Success)
+		}
+		if chunks[3].FG != rc.Theme.TextSecondary {
+			t.Errorf("staged count FG = %+v, want theme.TextSecondary %+v", chunks[3].FG, rc.Theme.TextSecondary)
+		}
+	})
+
+	t.Run("conflicts render with the alert icon, not a bare ASCII bang", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{}, &gitstatus.Status{Branch: "main", Conflicts: 1})
+		chunks, ok := (gitSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		text := chunkText(chunks)
+		if strings.Contains(text, "!") {
+			t.Errorf("rendered text = %q, want no bare ASCII ! (an icon should carry this meaning)", text)
+		}
+		if len(chunks) != 4 {
+			t.Fatalf("Render() produced %d chunks, want 4 (branch icon, branch name, conflict icon, conflict count)", len(chunks))
+		}
+		if chunks[2].FG != rc.Theme.Danger {
+			t.Errorf("conflict icon FG = %+v, want theme.Danger %+v", chunks[2].FG, rc.Theme.Danger)
+		}
+	})
+
 	t.Run("detached head shows short oid", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{}, &gitstatus.Status{Detached: true, OID: "abcdef1234567890"})

@@ -26,6 +26,6 @@ func (repoSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 		{Text: icon, FG: rc.Theme.IdentityAccent},
 		{Text: " " + r.Host, FG: rc.Theme.Muted},
 		{Text: "/" + r.Owner, FG: rc.Theme.TextSecondary},
-		{Text: "/" + r.Name, FG: rc.Theme.TextPrimary},
+		{Text: "/" + r.Name, FG: rc.Theme.IdentityText},
 	}, true
 }

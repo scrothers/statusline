@@ -47,4 +47,19 @@ func TestRepoSegment(t *testing.T) {
 			t.Errorf("chunks = %+v, want at least 3 (host, owner, name broken out)", chunks)
 		}
 	})
+
+	t.Run("repo name uses identity text color, matching other headline labels", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{
+			Workspace: &input.Workspace{Repo: &input.Repo{Host: "github.com", Owner: "scrothers", Name: "statusline"}},
+		}, nil)
+		chunks, ok := (repoSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		last := chunks[len(chunks)-1]
+		if last.FG != rc.Theme.IdentityText {
+			t.Errorf("repo name FG = %+v, want theme.IdentityText %+v", last.FG, rc.Theme.IdentityText)
+		}
+	})
 }

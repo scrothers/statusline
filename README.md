@@ -8,7 +8,7 @@ for anyone who wants to tweak it further.
 ```
 [38;2;254;128;25m󰚩[0m[38;2;213;196;161m Opus[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;146;131;116m    [0m[38;2;241;196;15m󰊚 high[0m[38;2;146;131;116m    [0m[38;2;250;147;48m󰍛[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;190;187;38m█[0m[38;2;197;187;39m█[0m[38;2;204;187;40m█[0m[38;2;211;187;41m█[0m[38;2;218;188;42m█[0m[38;2;225;188;43m█[0m[38;2;232;188;44m█[0m[38;2;239;188;45m█[0m[38;2;246;188;46m█[0m[38;2;250;182;47m█[0m[38;2;250;170;47m█[0m[38;2;250;158;48m█[0m[38;2;250;146;48m▋[0m[38;2;80;73;69m░░░░░░[0m[38;2;146;131;116m⟩ [0m[38;2;250;147;48m68%[0m[38;2;146;131;116m 136.0k/64.0k[0m[38;2;146;131;116m    [0m[38;2;239;188;45m 5h[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;210;187;41m█[0m[38;2;236;188;45m▌[0m[38;2;80;73;69m░░░[0m[38;2;146;131;116m⟩[0m[38;2;239;188;45m 42%[0m[38;2;146;131;116m    [0m[38;2;250;140;49m󰨳 7d[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;210;187;41m█[0m[38;2;236;188;45m█[0m[38;2;250;165;48m█[0m[38;2;250;119;50m▎[0m[38;2;80;73;69m░[0m[38;2;146;131;116m⟩[0m[38;2;250;140;49m 71%[0m[38;2;146;131;116m    [0m[38;2;211;187;41m[0m[38;2;211;187;41m 79%[0m[38;2;146;131;116m (108.0k)[0m
 [38;2;254;128;25m[0m[38;2;213;196;161m big-refactor[0m[38;2;146;131;116m    [0m[38;2;254;128;25m󰉋[0m[38;2;213;196;161m /home/user/code/statusline[0m[38;2;146;131;116m    [0m[38;2;250;189;47m  [0m[38;2;184;187;38m[0m[38;2;213;196;161m 342[0m[38;2;251;73;52m [0m[38;2;213;196;161m 58[0m[38;2;146;131;116m    [0m[38;2;250;189;47m  [0m[38;2;184;187;38m󰄠[0m[38;2;213;196;161m 20.0k[0m[38;2;251;73;52m 󰄝[0m[38;2;213;196;161m 4.5k[0m[38;2;142;192;124m 󰆺[0m[38;2;213;196;161m 8.0k[0m[38;2;142;192;124m [0m[38;2;213;196;161m 108.0k[0m[38;2;146;131;116m    [0m[38;2;184;187;38m[0m[38;2;235;219;178m2.17[0m[38;2;146;131;116m    [0m[38;2;142;192;124m[0m[38;2;235;219;178m 1:23:45[0m
-[38;2;254;128;25m[0m[38;2;146;131;116m github.com[0m[38;2;213;196;161m/scrothers[0m[38;2;235;219;178m/statusline[0m[38;2;146;131;116m    [0m[38;2;184;187;38m #128[0m[38;2;184;187;38m approved[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;235;219;178m main[0m[38;2;184;187;38m 󰔡 2[0m[38;2;250;189;47m  1[0m[38;2;146;131;116m  3[0m[38;2;184;187;38m ↑ 1[0m[38;2;146;131;116m    [0m[38;2;142;192;124m󰤨 my-feature[0m
+[38;2;254;128;25m[0m[38;2;146;131;116m github.com[0m[38;2;213;196;161m/scrothers[0m[38;2;213;196;161m/statusline[0m[38;2;146;131;116m    [0m[38;2;184;187;38m[0m[38;2;213;196;161m #128[0m[38;2;184;187;38m approved[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;213;196;161m main[0m[38;2;184;187;38m 󰔡[0m[38;2;213;196;161m 2[0m[38;2;250;189;47m  [0m[38;2;213;196;161m 1[0m[38;2;146;131;116m [0m[38;2;213;196;161m 3[0m[38;2;184;187;38m ↑[0m[38;2;213;196;161m 1[0m[38;2;146;131;116m    [0m[38;2;254;128;25m󰤨[0m[38;2;213;196;161m my-feature[0m
 ```
 
 (a real render — `statusline demo --theme gruvbox --scenario full`)
@@ -132,6 +132,16 @@ success-green (money) and the clock icon is info, while the amount and the
 clock-style duration both render in the theme's primary text color — plain
 prose, not a semantic accent, since a dollar figure or elapsed time isn't
 inherently good/bad/informational the way a gauge fill is.
+
+Line 3 follows the same rules as everywhere else. `git`'s status badges
+(staged/modified/untracked/conflicts/ahead/behind) each split into a
+category-colored icon and a `TextSecondary` count, matching
+`lines_changed`/`token_counts`; conflicts use a proper alert icon rather
+than a bare `!`. The branch name, `repo`'s final `/name` piece, `pr`'s
+number, and `worktree`'s name all use `IdentityText` — the same "headline
+label following an identity-colored icon" role as `model`/`directory`/
+`session_name` — while `pr`'s icon and review-state word still share the
+review-state color, since that state is the actual signal.
 
 ## Themes
 

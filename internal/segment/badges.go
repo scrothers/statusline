@@ -7,9 +7,10 @@ import (
 	"github.com/scrothers/statusline/internal/theme"
 )
 
-// prSegment renders the open pull request for the current branch: the PR
-// number (hyperlinked to its URL when present) and its review state as two
-// distinct pieces, both colored by review state.
+// prSegment renders the open pull request for the current branch: an icon
+// and review-state word colored by that state (the actual signal), and the
+// PR number (hyperlinked to its URL when present) in a neutral identifier
+// color, since it's an identifier rather than a status.
 type prSegment struct{}
 
 func (prSegment) ID() string { return "pr" }
@@ -50,7 +51,8 @@ func (prSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 		number = style.Hyperlink(number, pr.URL)
 	}
 	chunks := []style.Chunk{
-		{Text: theme.Glyph(iconKey, nerd) + " " + number, FG: color},
+		{Text: theme.Glyph(iconKey, nerd), FG: color},
+		{Text: " " + number, FG: rc.Theme.IdentityText},
 	}
 	if word, ok := reviewStateWords[pr.ReviewState]; ok {
 		chunks = append(chunks, style.Chunk{Text: " " + word, FG: color})

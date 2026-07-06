@@ -11,7 +11,6 @@ const (
 	IconGitUntracked      = "git_untracked"
 	IconGitAhead          = "git_ahead"
 	IconGitBehind         = "git_behind"
-	IconGitCleanDot       = "git_clean_dot"
 	IconPR                = "pr"
 	IconPRDraft           = "pr_draft"
 	IconPRPending         = "pr_pending"
@@ -71,7 +70,6 @@ var Icons = map[string]Icon{
 	IconGitUntracked:      {Glyph: "\uF059", Fallback: "?"},             // nf-fa-question
 	IconGitAhead:          {Glyph: "↑", Fallback: "↑"},                  // plain unicode
 	IconGitBehind:         {Glyph: "↓", Fallback: "↓"},                  // plain unicode
-	IconGitCleanDot:       {Glyph: "●", Fallback: "●"},                  // plain unicode
 	IconPR:                {Glyph: "\uF407", Fallback: "PR"},            // nf-oct-git_pull_request
 	IconPRDraft:           {Glyph: "\uF5D9", Fallback: "[draft]"},       // nf-oct-git_pull_request_draft (approx)
 	IconPRPending:         {Glyph: "\U000F0DA5", Fallback: "[review]"},  // nf-md-clock_alert_outline (approx)
