@@ -73,13 +73,13 @@ var Icons = map[string]Icon{
 	IconContextAlert:      {Glyph: "\U000F0026", Fallback: "!!"},        // nf-md-alert
 	IconCost:              {Glyph: "\uF155", Fallback: "$"},             // nf-fa-dollar
 	IconDuration:          {Glyph: "\uF017", Fallback: "⏱"},             // nf-fa-clock_o
-	IconRateLimitFiveHour: {Glyph: "\U000F051F", Fallback: "5h:"},       // nf-md-timer_sand
-	IconRateLimitWeek:     {Glyph: "\U000F0F94", Fallback: "7d:"},       // nf-md-calendar_week
+	IconRateLimitFiveHour: {Glyph: "\uF252", Fallback: "5h:"},           // nf-fa-hourglass_2
+	IconRateLimitWeek:     {Glyph: "\U000F0A33", Fallback: "7d:"},       // nf-md-calendar_week
 	IconVim:               {Glyph: "\uF11C", Fallback: "[mode]"},        // nf-fa-keyboard_o
 	IconAgent:             {Glyph: "\U000F0904", Fallback: "agent:"},    // nf-md-account_hard_hat
 	IconOutputStyle:       {Glyph: "\U000F0765", Fallback: "style:"},    // nf-md-palette_outline
 	IconThinking:          {Glyph: "\uF0EB", Fallback: "thinking"},      // nf-fa-lightbulb_o
-	IconCache:             {Glyph: "\U000F0224", Fallback: "cache"},     // nf-md-database_outline (approx)
+	IconCache:             {Glyph: "\uF49B", Fallback: "cache"},         // nf-oct-cache
 	IconSessionName:       {Glyph: "\uF02B", Fallback: "session:"},      // nf-fa-tag
 	IconRepo:              {Glyph: "\uF401", Fallback: "repo:"},         // nf-oct-repo
 	IconWorktree:          {Glyph: "\U000F0928", Fallback: "worktree:"}, // nf-md-source_branch (approx)

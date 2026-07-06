@@ -6,7 +6,7 @@ divider, truecolor, five built-in themes, and an optional TOML config file
 for anyone who wants to tweak it further.
 
 ```
-󰚩 Opus        󰊚 high    󰍛 ⟨█████████████▋░░░░░░⟩ 68% 136.0k/64.0k    󰔟 5h ⟨██▌░░░⟩ 42%    󰾔 7d ⟨████▎░⟩ 71%    󰈤 79% (108.0k)
+󰚩 Opus        󰊚 high    󰍛 ⟨█████████████▋░░░░░░⟩ 68% 136.0k/64.0k     5h ⟨██▌░░░⟩ 42%    󰨳 7d ⟨████▎░⟩ 71%     79% (108.0k)
  big-refactor    󰉋 /home/user/code/statusline    +342 -58     $2.17  1:23:45
  github.com/scrothers/statusline     #128 approved     main 󰔡 2  1  3 ↑ 1    󰤨 my-feature
 ```
