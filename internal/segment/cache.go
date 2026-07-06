@@ -10,7 +10,9 @@ import (
 
 // cacheSegment renders prompt-cache effectiveness from the most recent API
 // response: the fraction of input tokens served from cache, plus the raw
-// cache-read token count.
+// cache-read token count. Unlike the context/rate-limit gauges, a high
+// percentage here means the cache is doing its job, so the gradient runs
+// the opposite direction: green at 100%, red at 0%.
 type cacheSegment struct{}
 
 func (cacheSegment) ID() string { return "cache" }
@@ -30,9 +32,13 @@ func (cacheSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 
 	pct := float64(u.CacheReadInputTokens) / float64(total) * 100
+	color := aggregateGradientColor(rc.Theme, 100-pct)
 	icon := theme.Glyph(theme.IconCache, rc.Config.NerdFontEnabled())
-	text := fmt.Sprintf("%s %.0f%% (%s)", icon, pct, formatTokenCount(u.CacheReadInputTokens))
-	return []style.Chunk{{Text: text, FG: rc.Theme.Info}}, true
+	return []style.Chunk{
+		{Text: icon, FG: color},
+		{Text: fmt.Sprintf(" %.0f%%", pct), FG: color},
+		{Text: fmt.Sprintf(" (%s)", formatTokenCount(u.CacheReadInputTokens)), FG: rc.Theme.Muted},
+	}, true
 }
 
 // formatTokenCount renders a token count with a k/M suffix for readability

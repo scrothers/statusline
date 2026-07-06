@@ -74,4 +74,52 @@ func TestCacheSegment(t *testing.T) {
 			t.Errorf("rendered text = %q, want it to contain 8.0k", text)
 		}
 	})
+
+	t.Run("icon and percentage share the gradient color, the count is muted", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{
+			ContextWindow: &input.ContextWindow{
+				CurrentUsage: &input.Usage{InputTokens: 1000, CacheCreationInputTokens: 1000, CacheReadInputTokens: 8000},
+			},
+		}, nil)
+		chunks, ok := (cacheSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) != 3 {
+			t.Fatalf("Render() produced %d chunks, want 3 (icon, percentage, count)", len(chunks))
+		}
+		if chunks[0].FG != chunks[1].FG {
+			t.Errorf("icon FG = %+v, percentage FG = %+v, want them equal", chunks[0].FG, chunks[1].FG)
+		}
+		if chunks[2].FG != rc.Theme.Muted {
+			t.Errorf("count FG = %+v, want theme.Muted %+v", chunks[2].FG, rc.Theme.Muted)
+		}
+	})
+
+	t.Run("gradient is inverted: a high hit rate is green, a low hit rate is red", func(t *testing.T) {
+		t.Parallel()
+
+		highHitRate := newTestContext(t, &input.Payload{
+			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{CacheReadInputTokens: 1000}},
+		}, nil)
+		chunks, ok := (cacheSegment{}).Render(highHitRate)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if chunks[0].FG != highHitRate.Theme.Success {
+			t.Errorf("100%% hit rate FG = %+v, want theme.Success %+v", chunks[0].FG, highHitRate.Theme.Success)
+		}
+
+		lowHitRate := newTestContext(t, &input.Payload{
+			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{InputTokens: 1000}},
+		}, nil)
+		chunks, ok = (cacheSegment{}).Render(lowHitRate)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if chunks[0].FG != lowHitRate.Theme.Danger {
+			t.Errorf("0%% hit rate FG = %+v, want theme.Danger %+v", chunks[0].FG, lowHitRate.Theme.Danger)
+		}
+	})
 }
