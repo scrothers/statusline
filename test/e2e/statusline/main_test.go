@@ -89,7 +89,7 @@ func TestE2E_version(t *testing.T) {
 
 func TestE2E_allThemesRenderCleanly(t *testing.T) {
 	payload := `{"model":{"display_name":"Opus"},"cwd":"/tmp","context_window":{"used_percentage":50},"session_id":"s3"}`
-	for _, name := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"} {
+	for _, name := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula", "claude-dark", "claude-light"} {
 		t.Run(name, func(t *testing.T) {
 			out, code := run(t, payload, nil, "--theme", name)
 			if code != 0 {
@@ -132,7 +132,7 @@ func TestE2E_demoDefaultShowsAllThemes(t *testing.T) {
 	if code != 0 {
 		t.Errorf("exit code = %d, want 0", code)
 	}
-	for _, theme := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"} {
+	for _, theme := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula", "claude-dark", "claude-light"} {
 		if !strings.Contains(out, theme) {
 			t.Errorf("demo output missing theme header %q:\n%s", theme, out)
 		}

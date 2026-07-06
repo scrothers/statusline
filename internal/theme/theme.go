@@ -22,7 +22,7 @@ const DefaultName = "gruvbox"
 // names is the built-in theme list in a fixed display order (matching the
 // README's theme table), since a map (as LoadRegistry returns) has no
 // stable iteration order.
-var names = []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"}
+var names = []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula", "claude-dark", "claude-light"}
 
 // Names returns the built-in theme names in a fixed, stable display order.
 func Names() []string {

@@ -37,8 +37,8 @@ func TestNames(t *testing.T) {
 	t.Parallel()
 
 	got := Names()
-	if len(got) != 5 {
-		t.Fatalf("Names() = %v, want 5 entries", got)
+	if len(got) != 7 {
+		t.Fatalf("Names() = %v, want 7 entries", got)
 	}
 	if got[0] != DefaultName {
 		t.Errorf("Names()[0] = %q, want DefaultName %q (default listed first)", got[0], DefaultName)

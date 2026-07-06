@@ -1,0 +1,13 @@
+name = "claude-light"
+
+[colors]
+identity_accent = "#D97757"
+identity_text   = "#3D3D3A"
+text_primary    = "#141413"
+text_secondary  = "#3D3D3A"
+success         = "#5C7A45"
+warning         = "#A9762E"
+danger          = "#A8443A"
+info            = "#4C7DAD"
+muted           = "#6C6A64"
+track_dim       = "#E8E6DC"

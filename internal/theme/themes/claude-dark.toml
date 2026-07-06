@@ -1,0 +1,13 @@
+name = "claude-dark"
+
+[colors]
+identity_accent = "#D97757"
+identity_text   = "#E8E6DC"
+text_primary    = "#FAF9F5"
+text_secondary  = "#E8E6DC"
+success         = "#788C5D"
+warning         = "#D4A24C"
+danger          = "#C1584C"
+info            = "#6A9BCC"
+muted           = "#B0AEA5"
+track_dim       = "#3D3D3A"

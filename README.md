@@ -153,7 +153,7 @@ available.
 
 ## Themes
 
-Five built-in themes, selected with `theme = "<name>"` in config or
+Seven built-in themes, selected with `theme = "<name>"` in config or
 `--theme <name>` on the command line. `gruvbox` is the default. Themes are
 foreground-only palettes (identity accent + success/warning/danger/info/muted
 roles) — there's no background token, since the statusline never paints one.
@@ -165,6 +165,15 @@ roles) — there's no background token, since the statusline never paints one.
 | `tokyo-night` | Cool blues/purples on near-black |
 | `nord` | Arctic blues |
 | `dracula` | High-contrast purple/pink |
+| `claude-dark` | Anthropic's coral/terracotta accent on a warm near-black ink background |
+| `claude-light` | The same coral/terracotta accent on a warm cream background — the one built-in theme meant for a light terminal |
+
+`claude-dark` and `claude-light` are built from Anthropic's published brand
+palette (the `#D97757` coral, `#141413` ink, `#FAF9F5` cream, plus a sage
+green and dusty blue used for `success`/`info`); `warning` and `danger`
+aren't part of that palette, so they're original colors chosen to sit
+comfortably in the same warm, muted family rather than clashing with a
+generic bright red/yellow.
 
 ## Configuration
 

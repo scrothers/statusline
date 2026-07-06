@@ -42,7 +42,7 @@ func newRootCmd() *cobra.Command {
 	cmd.CompletionOptions.DisableDefaultCmd = true
 	cmd.SetVersionTemplate("statusline {{.Version}}\n")
 	cmd.Flags().StringVar(&configPath, "config", "", "path to a TOML config file (overrides discovery)")
-	cmd.Flags().StringVar(&themeName, "theme", "", "theme override: gruvbox, catppuccin-mocha, tokyo-night, nord, dracula")
+	cmd.Flags().StringVar(&themeName, "theme", "", "theme override: gruvbox, catppuccin-mocha, tokyo-night, nord, dracula, claude-dark, claude-light")
 	cmd.AddCommand(newDemoCmd())
 	return cmd
 }
