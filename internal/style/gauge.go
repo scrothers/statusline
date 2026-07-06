@@ -6,13 +6,16 @@ import "strings"
 // seven-eighths full; a fully-filled cell uses '█' directly.
 var blockLevels = [...]rune{'▏', '▎', '▍', '▌', '▋', '▊', '▉'}
 
-// BlockBar renders pct (clamped to [0, 100]) as a width-cell bar using an
-// eight-level smooth block ramp, giving width*8 discrete fill levels instead
-// of the width levels a plain filled/empty bar would give. The returned
-// string carries no color; callers paint it via Chunk.FG.
-func BlockBar(pct float64, width int) string {
+// BlockBarParts renders pct (clamped to [0, 100]) as a width-cell bar using
+// an eight-level smooth block ramp — giving width*8 discrete fill levels
+// instead of the width levels a plain filled/empty bar would give — and
+// returns the filled and empty (track) portions as separate strings so the
+// caller can paint them in different colors (typically a threshold color
+// for filled, Theme.TrackDim for track). Concatenating filled+track always
+// yields a string exactly width runes long.
+func BlockBarParts(pct float64, width int) (filled, track string) {
 	if width <= 0 {
-		return ""
+		return "", ""
 	}
 	if pct < 0 {
 		pct = 0
@@ -33,8 +36,8 @@ func BlockBar(pct float64, width int) string {
 		b.WriteRune(blockLevels[partial-1])
 		full++
 	}
-	for range width - full {
-		b.WriteRune('░')
-	}
-	return b.String()
+	filled = b.String()
+
+	track = strings.Repeat("░", width-full)
+	return filled, track
 }

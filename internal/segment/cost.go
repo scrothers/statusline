@@ -25,8 +25,8 @@ func (costSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	durText := formatClock(cost.TotalDurationMS)
 
 	return []style.Chunk{
-		{Text: theme.Glyph(theme.IconCost, nerd) + costText, FG: rc.Theme.Info},
-		{Text: " " + theme.Glyph(theme.IconDuration, nerd) + durText, FG: rc.Theme.Info},
+		{Text: theme.Glyph(theme.IconCost, nerd) + " " + costText, FG: rc.Theme.Info},
+		{Text: " " + theme.Glyph(theme.IconDuration, nerd) + " " + durText, FG: rc.Theme.Info},
 	}, true
 }
 

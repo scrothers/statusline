@@ -35,13 +35,13 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	pct := contextWindowPercentage(cw)
 	nerd := rc.Config.NerdFontEnabled()
-	bar := style.BlockBar(pct, contextWindowGaugeWidth)
+	filled, track := style.BlockBarParts(pct, contextWindowGaugeWidth)
 	pctText := fmt.Sprintf("%.0f%%", pct)
 
 	if rc.Payload.Exceeds200k || pct >= contextAlertThreshold {
 		icon := theme.Glyph(theme.IconContextAlert, nerd)
 		return []style.Chunk{
-			{Text: icon + " ⟨" + bar + "⟩ " + pctText, FG: rc.Theme.Danger, Bold: true},
+			{Text: icon + " ⟨" + filled + track + "⟩ " + pctText, FG: rc.Theme.Danger, Bold: true},
 		}, true
 	}
 
@@ -50,7 +50,8 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	return []style.Chunk{
 		{Text: icon, FG: color},
 		{Text: " ⟨", FG: rc.Theme.Muted},
-		{Text: bar, FG: color},
+		{Text: filled, FG: color},
+		{Text: track, FG: rc.Theme.TrackDim},
 		{Text: "⟩ ", FG: rc.Theme.Muted},
 		{Text: pctText, FG: color},
 	}, true

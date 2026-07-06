@@ -46,37 +46,37 @@ func (gitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	if st.Staged > 0 {
 		chunks = append(chunks, style.Chunk{
-			Text: " " + theme.Glyph(theme.IconGitStaged, nerd) + strconv.Itoa(st.Staged),
+			Text: " " + theme.Glyph(theme.IconGitStaged, nerd) + " " + strconv.Itoa(st.Staged),
 			FG:   rc.Theme.Success,
 		})
 	}
 	if st.Modified > 0 {
 		chunks = append(chunks, style.Chunk{
-			Text: " " + theme.Glyph(theme.IconGitModified, nerd) + strconv.Itoa(st.Modified),
+			Text: " " + theme.Glyph(theme.IconGitModified, nerd) + " " + strconv.Itoa(st.Modified),
 			FG:   rc.Theme.Warning,
 		})
 	}
 	if st.Untracked > 0 {
 		chunks = append(chunks, style.Chunk{
-			Text: " " + theme.Glyph(theme.IconGitUntracked, nerd) + strconv.Itoa(st.Untracked),
+			Text: " " + theme.Glyph(theme.IconGitUntracked, nerd) + " " + strconv.Itoa(st.Untracked),
 			FG:   rc.Theme.Muted,
 		})
 	}
 	if st.Conflicts > 0 {
 		chunks = append(chunks, style.Chunk{
-			Text: " !" + strconv.Itoa(st.Conflicts),
+			Text: " ! " + strconv.Itoa(st.Conflicts),
 			FG:   rc.Theme.Danger,
 		})
 	}
 	if st.Ahead > 0 {
 		chunks = append(chunks, style.Chunk{
-			Text: " " + theme.Glyph(theme.IconGitAhead, nerd) + strconv.Itoa(st.Ahead),
+			Text: " " + theme.Glyph(theme.IconGitAhead, nerd) + " " + strconv.Itoa(st.Ahead),
 			FG:   rc.Theme.Success,
 		})
 	}
 	if st.Behind > 0 {
 		chunks = append(chunks, style.Chunk{
-			Text: " " + theme.Glyph(theme.IconGitBehind, nerd) + strconv.Itoa(st.Behind),
+			Text: " " + theme.Glyph(theme.IconGitBehind, nerd) + " " + strconv.Itoa(st.Behind),
 			FG:   rc.Theme.Warning,
 		})
 	}

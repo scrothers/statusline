@@ -13,8 +13,13 @@ import (
 // text joined by a plain colored divider.
 const dividerGlyph = "\uE0B1"
 
+// dividerText is the full divider run between two segments: generous
+// padding on both sides of the glyph so segments read as clearly separate
+// pieces rather than crowding the chevron.
+const dividerText = "   " + dividerGlyph + "   "
+
 // joinLine renders one line's segments into a single string: each
-// segment's chunks painted in sequence, with " <dividerGlyph> " (colored
+// segment's chunks painted in sequence, with dividerText (colored
 // dividerColor) between adjacent segments. The background is always
 // style.Default regardless of what a chunk's BG field holds — no segment
 // may paint a background, and this is where that's enforced centrally
@@ -27,7 +32,7 @@ func joinLine(segments []lineSegment, dividerColor style.Color) string {
 	var b strings.Builder
 	for i, seg := range segments {
 		if i > 0 {
-			b.WriteString(style.Paint(" "+dividerGlyph+" ", dividerColor, style.Default, false))
+			b.WriteString(style.Paint(dividerText, dividerColor, style.Default, false))
 		}
 		for _, c := range seg.chunks {
 			b.WriteString(style.Paint(c.Text, c.FG, style.Default, c.Bold))

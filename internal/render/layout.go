@@ -11,9 +11,10 @@ import (
 // at this priority and are only ever shrunk internally, never omitted).
 const neverDropPriority = 100
 
-// dividerWidth is the display width of " <dividerGlyph> " between two
-// adjacent segments on a line.
-const dividerWidth = 3
+// dividerWidth is the display width of dividerText (defined in divider.go)
+// between two adjacent segments on a line: 3 spaces + a single-width glyph
+// + 3 spaces.
+const dividerWidth = 7
 
 // lineSegment is one rendered segment ready for width-fitting and joining:
 // its chunks plus the metadata layout needs without re-deriving it.

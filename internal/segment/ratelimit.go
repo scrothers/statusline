@@ -62,11 +62,15 @@ func (s rateLimitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 
 	color := gaugeColor(rc.Theme, win.UsedPercentage)
-	bar := style.BlockBar(win.UsedPercentage, rateLimitGaugeWidth)
+	filled, track := style.BlockBarParts(win.UsedPercentage, rateLimitGaugeWidth)
 	icon := theme.Glyph(iconKey, rc.Config.NerdFontEnabled())
 
 	return []style.Chunk{
-		{Text: icon + bar, FG: color},
+		{Text: icon, FG: color},
+		{Text: " ⟨", FG: rc.Theme.Muted},
+		{Text: filled, FG: color},
+		{Text: track, FG: rc.Theme.TrackDim},
+		{Text: "⟩", FG: rc.Theme.Muted},
 		{Text: fmt.Sprintf(" %.0f%%", win.UsedPercentage), FG: color},
 	}, true
 }
