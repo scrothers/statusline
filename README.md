@@ -232,6 +232,7 @@ make test-integration   # + real git subprocess tests
 make test-e2e           # + builds and drives the real binary
 make bench               # benchmarks for the render/parse/config/theme hot paths
 make lint                # go vet + golangci-lint
+make security            # govulncheck + gosec
 ```
 
 The whole non-git-subprocess render path — JSON decode, config/theme load,

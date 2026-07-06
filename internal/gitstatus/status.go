@@ -117,6 +117,9 @@ func runGitStatus(ctx context.Context, cfg config.GitConfig, dir string) (Status
 	cctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
+	// #nosec G204 -- "git" is a fixed literal; dir is passed as a discrete
+	// argument (no shell involved), so there's no injection surface, only
+	// git operating on whatever directory it's pointed at, which is the point.
 	cmd := exec.CommandContext(cctx, "git", "-C", dir, "status", "--porcelain=v2", "--branch", "--untracked-files=normal")
 	cmd.Env = append(os.Environ(), "GIT_OPTIONAL_LOCKS=0", "LC_ALL=C")
 	out, err := cmd.Output()

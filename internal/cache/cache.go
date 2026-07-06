@@ -12,7 +12,7 @@ import (
 // unreadable, corrupt JSON), since a cache miss and a cache read failure are
 // handled identically by every caller: fall through to recomputing.
 func Load[T any](dir, key string) (entry T, ok bool) {
-	data, err := os.ReadFile(filepath.Join(dir, key))
+	data, err := os.ReadFile(filepath.Join(dir, key)) // #nosec G304 -- dir is os.UserCacheDir()-derived, key is an internal sha256-derived cache key, never user input
 	if err != nil {
 		return entry, false
 	}
@@ -27,7 +27,7 @@ func Load[T any](dir, key string) (entry T, ok bool) {
 // (Claude Code SIGTERMs a superseded in-flight statusline run) never leaves
 // a partially-written cache file for the next invocation to trip over.
 func StoreAtomic[T any](dir, key string, entry T) error {
-	if err := os.MkdirAll(dir, 0o755); err != nil {
+	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return fmt.Errorf("cache: create dir %s: %w", dir, err)
 	}
 

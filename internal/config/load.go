@@ -32,6 +32,9 @@ func Load(explicitPath string) (Config, []string) {
 		}
 	}
 
+	// #nosec G304 -- path is either the user's own --config flag or one of
+	// the two fixed, well-known config locations in candidatePaths(); both
+	// are the same trust level as any CLI tool's config file argument.
 	data, err := os.ReadFile(path)
 	if err != nil {
 		warnings = append(warnings, fmt.Sprintf("statusline: reading config %s: %v (using defaults)", path, err))

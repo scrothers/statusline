@@ -46,7 +46,7 @@ const (
 	IconTokensTicket      = "tokens_ticket"
 	IconTokensInput       = "tokens_input"
 	IconTokensOutput      = "tokens_output"
-	IconTokensCacheCreate = "tokens_cache_create"
+	IconTokensCacheCreate = "tokens_cache_create" // #nosec G101 -- an icon key constant, not a credential; gosec's heuristic matches "token" in the name
 	IconRateLimitReset    = "ratelimit_reset"
 )
 
