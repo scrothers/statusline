@@ -21,7 +21,7 @@ func (costSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 
 	nerd := rc.Config.NerdFontEnabled()
-	costText := fmt.Sprintf("$%.2f", cost.TotalCostUSD)
+	costText := fmt.Sprintf("%.2f", cost.TotalCostUSD)
 	durText := formatClock(cost.TotalDurationMS)
 
 	return []style.Chunk{

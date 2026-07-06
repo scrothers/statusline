@@ -47,11 +47,29 @@ func TestCostSegment(t *testing.T) {
 			t.Fatal("Render() ok = false, want true")
 		}
 		text := chunkText(chunks)
-		if !strings.Contains(text, "$1.23") {
-			t.Errorf("rendered text = %q, want it to contain $1.23", text)
+		if !strings.Contains(text, "1.23") {
+			t.Errorf("rendered text = %q, want it to contain 1.23", text)
+		}
+		if strings.Count(text, "$") > 0 {
+			t.Errorf("rendered text = %q, want no literal $ when the nerd font dollar icon already renders one", text)
 		}
 		if !strings.Contains(text, "01:05") {
 			t.Errorf("rendered text = %q, want it to contain 01:05", text)
+		}
+	})
+
+	t.Run("plain fallback still shows exactly one dollar sign", func(t *testing.T) {
+		t.Parallel()
+		nerdFont := false
+		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalCostUSD: 1.234, TotalDurationMS: 65_000}}, nil)
+		rc.Config.NerdFont = &nerdFont
+		chunks, ok := (costSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		text := chunkText(chunks)
+		if strings.Count(text, "$") != 1 {
+			t.Errorf("rendered text = %q, want exactly one $", text)
 		}
 	})
 }

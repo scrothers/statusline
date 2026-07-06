@@ -65,7 +65,7 @@ func TestRender_fullPayload(t *testing.T) {
 
 	for _, want := range []string{
 		"Opus", "high", "42%", "30%", "71%", "80%", "8.0k", // Claude line
-		"big-refactor", "statusline", "+342", "-58", "$1.23", // session line
+		"big-refactor", "statusline", "+342", "-58", "1.23", // session line
 		"github.com", "scrothers", "128", "approved", "main", "my-feature", // git line
 	} {
 		if !strings.Contains(got, want) {
