@@ -26,7 +26,8 @@ const (
 	IconVim               = "vim"
 	IconAgent             = "agent"
 	IconOutputStyle       = "output_style"
-	IconThinking          = "thinking"
+	IconThinkingOn        = "thinking_on"
+	IconThinkingOff       = "thinking_off"
 	IconCache             = "cache"
 	IconSessionName       = "session_name"
 	IconRepo              = "repo"
@@ -78,7 +79,8 @@ var Icons = map[string]Icon{
 	IconVim:               {Glyph: "\uF11C", Fallback: "[mode]"},        // nf-fa-keyboard_o
 	IconAgent:             {Glyph: "\U000F0904", Fallback: "agent:"},    // nf-md-account_hard_hat
 	IconOutputStyle:       {Glyph: "\U000F0765", Fallback: "style:"},    // nf-md-palette_outline
-	IconThinking:          {Glyph: "\uF0EB", Fallback: "thinking"},      // nf-fa-lightbulb_o
+	IconThinkingOn:        {Glyph: "\uEA61", Fallback: "thinking"},      // nf-cod-lightbulb
+	IconThinkingOff:       {Glyph: "\uF0EB", Fallback: "idle"},          // nf-fa-lightbulb
 	IconCache:             {Glyph: "\uF49B", Fallback: "cache"},         // nf-oct-cache
 	IconSessionName:       {Glyph: "\uF02B", Fallback: "session:"},      // nf-fa-tag
 	IconRepo:              {Glyph: "\uF401", Fallback: "repo:"},         // nf-oct-repo

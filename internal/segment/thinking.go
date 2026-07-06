@@ -5,11 +5,11 @@ import (
 	"github.com/scrothers/statusline/internal/theme"
 )
 
-// thinkingSegment renders an icon when extended thinking is enabled for the
-// session. It's a fact about the session's configuration, not a state, so
-// it uses the identity accent; it's simply omitted when thinking is off or
-// absent, matching the "skip the uninteresting default" pattern used by
-// outputStyleSegment.
+// thinkingSegment renders a lit yellow bulb when extended thinking is
+// enabled, or a greyed-out bulb when it's explicitly off — unlike most
+// segments, "off" is still informative here, so it's shown rather than
+// omitted. Only a genuinely absent Thinking field (older clients/models
+// that don't report it at all) omits the segment entirely.
 type thinkingSegment struct{}
 
 func (thinkingSegment) ID() string { return "thinking" }
@@ -17,9 +17,17 @@ func (thinkingSegment) ID() string { return "thinking" }
 func (thinkingSegment) Priority() int { return 25 }
 
 func (thinkingSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
-	if rc.Payload.Thinking == nil || !rc.Payload.Thinking.Enabled {
+	thinking := rc.Payload.Thinking
+	if thinking == nil {
 		return nil, false
 	}
-	icon := theme.Glyph(theme.IconThinking, rc.Config.NerdFontEnabled())
-	return []style.Chunk{{Text: icon, FG: rc.Theme.IdentityAccent}}, true
+
+	nerd := rc.Config.NerdFontEnabled()
+	if thinking.Enabled {
+		icon := theme.Glyph(theme.IconThinkingOn, nerd)
+		return []style.Chunk{{Text: icon, FG: rc.Theme.Warning}}, true
+	}
+
+	icon := theme.Glyph(theme.IconThinkingOff, nerd)
+	return []style.Chunk{{Text: icon, FG: rc.Theme.Muted}}, true
 }
