@@ -7,7 +7,9 @@ import (
 	"github.com/scrothers/statusline/internal/theme"
 )
 
-// costSegment renders total session cost in USD.
+// costSegment renders total session cost in USD. The dollar icon is colored
+// (money-green); the amount itself renders in the theme's default text
+// color like ordinary prose, not a semantic accent.
 type costSegment struct{}
 
 func (costSegment) ID() string { return "cost" }
@@ -24,11 +26,14 @@ func (costSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	costText := fmt.Sprintf("%.2f", cost.TotalCostUSD)
 
 	return []style.Chunk{
-		{Text: theme.Glyph(theme.IconCost, nerd) + costText, FG: rc.Theme.Info},
+		{Text: theme.Glyph(theme.IconCost, nerd), FG: rc.Theme.Success},
+		{Text: costText, FG: rc.Theme.TextPrimary},
 	}, true
 }
 
-// durationSegment renders clock-style elapsed session duration.
+// durationSegment renders clock-style elapsed session duration. The clock
+// icon is colored; the duration itself renders in the theme's default text
+// color like ordinary prose, not a semantic accent.
 type durationSegment struct{}
 
 func (durationSegment) ID() string { return "duration" }
@@ -45,7 +50,8 @@ func (durationSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	durText := formatClock(cost.TotalDurationMS)
 
 	return []style.Chunk{
-		{Text: theme.Glyph(theme.IconDuration, nerd) + " " + durText, FG: rc.Theme.Info},
+		{Text: theme.Glyph(theme.IconDuration, nerd), FG: rc.Theme.Info},
+		{Text: " " + durText, FG: rc.Theme.TextPrimary},
 	}, true
 }
 

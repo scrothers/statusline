@@ -75,6 +75,24 @@ func TestCostSegment(t *testing.T) {
 			t.Errorf("rendered text = %q, want $ directly against 1.23 with no space", text)
 		}
 	})
+
+	t.Run("icon is colored, amount uses the theme's default text color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalCostUSD: 1.234}}, nil)
+		chunks, ok := (costSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) != 2 {
+			t.Fatalf("Render() produced %d chunks, want 2 (icon, amount)", len(chunks))
+		}
+		if chunks[0].FG != rc.Theme.Success {
+			t.Errorf("icon FG = %+v, want theme.Success %+v", chunks[0].FG, rc.Theme.Success)
+		}
+		if chunks[1].FG != rc.Theme.TextPrimary {
+			t.Errorf("amount FG = %+v, want theme.TextPrimary %+v", chunks[1].FG, rc.Theme.TextPrimary)
+		}
+	})
 }
 
 func TestDurationSegment(t *testing.T) {
@@ -97,6 +115,24 @@ func TestDurationSegment(t *testing.T) {
 		}
 		if !strings.Contains(chunkText(chunks), "01:05") {
 			t.Errorf("rendered text = %q, want it to contain 01:05", chunkText(chunks))
+		}
+	})
+
+	t.Run("icon is colored, duration uses the theme's default text color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalDurationMS: 65_000}}, nil)
+		chunks, ok := (durationSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) != 2 {
+			t.Fatalf("Render() produced %d chunks, want 2 (icon, duration)", len(chunks))
+		}
+		if chunks[0].FG != rc.Theme.Info {
+			t.Errorf("icon FG = %+v, want theme.Info %+v", chunks[0].FG, rc.Theme.Info)
+		}
+		if chunks[1].FG != rc.Theme.TextPrimary {
+			t.Errorf("duration FG = %+v, want theme.TextPrimary %+v", chunks[1].FG, rc.Theme.TextPrimary)
 		}
 	})
 }
