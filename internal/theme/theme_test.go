@@ -139,3 +139,13 @@ func TestThemeWithOverrides(t *testing.T) {
 		}
 	})
 }
+
+// BenchmarkLoadRegistry measures parsing every embedded theme TOML file, a
+// cost every real invocation pays once regardless of which theme is active.
+func BenchmarkLoadRegistry(b *testing.B) {
+	for b.Loop() {
+		if _, err := LoadRegistry(); err != nil {
+			b.Fatalf("LoadRegistry() error = %v", err)
+		}
+	}
+}

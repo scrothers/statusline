@@ -2,7 +2,7 @@ BINARY := statusline
 VERSION := $(shell git describe --tags --always --dirty 2>/dev/null || echo dev)
 LDFLAGS := -s -w -X main.version=$(VERSION)
 
-.PHONY: build test test-integration test-e2e fmt lint install clean
+.PHONY: build test test-integration test-e2e bench fmt lint install clean
 
 build:
 	go build -trimpath -ldflags="$(LDFLAGS)" -o $(BINARY) ./cmd/statusline
@@ -15,6 +15,9 @@ test-integration:
 
 test-e2e:
 	go test -tags e2e ./...
+
+bench:
+	go test -bench=. -benchmem -run=^$$ ./...
 
 fmt:
 	gofmt -s -l -w .

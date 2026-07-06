@@ -1,6 +1,10 @@
 package gitstatus
 
-import "testing"
+import (
+	"fmt"
+	"strings"
+	"testing"
+)
 
 func TestParsePorcelainV2(t *testing.T) {
 	t.Parallel()
@@ -100,5 +104,42 @@ func TestStatusClean(t *testing.T) {
 				t.Errorf("Clean() = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+// largePorcelainFixture builds a realistic worst-case porcelain-v2 output: a
+// branch header plus a large mixed-status working tree, closer to a big
+// monorepo mid-refactor than the tiny few-line fixtures above.
+func largePorcelainFixture(fileCount int) []byte {
+	var b strings.Builder
+	b.WriteString("# branch.oid abc1234567890\n")
+	b.WriteString("# branch.head main\n")
+	b.WriteString("# branch.upstream origin/main\n")
+	b.WriteString("# branch.ab +3 -5\n")
+	for i := range fileCount {
+		switch i % 4 {
+		case 0:
+			fmt.Fprintf(&b, "1 M. N... 100644 100644 100644 hash1 hash2 pkg/staged%d.go\n", i)
+		case 1:
+			fmt.Fprintf(&b, "1 .M N... 100644 100644 100644 hash1 hash2 pkg/modified%d.go\n", i)
+		case 2:
+			fmt.Fprintf(&b, "? pkg/untracked%d.go\n", i)
+		case 3:
+			fmt.Fprintf(&b, "2 R. N... 100644 100644 100644 hash1 hash2 R100 pkg/renamed%d.go\tpkg/old%d.go\n", i, i)
+		}
+	}
+	return []byte(b.String())
+}
+
+// BenchmarkParsePorcelainV2 measures the pure parser against a realistic
+// large working tree (500 changed files), the one piece of gitstatus that
+// doesn't depend on an external git subprocess and so is meaningful to
+// benchmark in isolation.
+func BenchmarkParsePorcelainV2(b *testing.B) {
+	fixture := largePorcelainFixture(500)
+	for b.Loop() {
+		if _, err := ParsePorcelainV2(fixture); err != nil {
+			b.Fatalf("ParsePorcelainV2() error = %v", err)
+		}
 	}
 }

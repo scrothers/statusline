@@ -27,6 +27,9 @@ jobs:
       - name: E2E tests
         run: go test -tags e2e ./...
 
+      - name: Benchmarks (smoke run, not timed)
+        run: go test -bench=. -benchtime=1x -run=^$ ./...
+
       - name: go vet
         run: go vet ./...
 

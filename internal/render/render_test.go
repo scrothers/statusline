@@ -220,3 +220,28 @@ func TestRenderLine_unknownSegmentIDsAreSkipped(t *testing.T) {
 		t.Errorf("renderLine() with only an unknown ID = %q, want empty", got)
 	}
 }
+
+// BenchmarkRender measures a full three-line render against every
+// default-layout segment at once (truecolor, not NO_COLOR) — the closest
+// single benchmark to real per-invocation latency, short of the git
+// subprocess and stdin JSON decode that happen outside this package.
+func BenchmarkRender(b *testing.B) {
+	registry, err := theme.LoadRegistry()
+	if err != nil {
+		b.Fatalf("theme.LoadRegistry() error = %v", err)
+	}
+	th, _ := theme.Resolve(registry, theme.DefaultName)
+	cfg := config.Default()
+	rc := &segment.RenderContext{
+		Payload: fullPayload(),
+		Config:  &cfg,
+		Theme:   &th,
+		Columns: 200,
+		Git:     &gitstatus.Status{Branch: "main", Staged: 2, Modified: 1, Untracked: 3, Ahead: 1},
+	}
+	reg := segment.Registry()
+
+	for b.Loop() {
+		Render(rc, reg)
+	}
+}

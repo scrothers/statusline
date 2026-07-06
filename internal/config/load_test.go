@@ -162,3 +162,12 @@ func TestDefault(t *testing.T) {
 		t.Errorf("Default() has an unset timing field: %+v", cfg)
 	}
 }
+
+// BenchmarkDefault measures the embedded-TOML decode every real invocation
+// pays once, part of the sub-100ms per-render latency budget the design
+// targets.
+func BenchmarkDefault(b *testing.B) {
+	for b.Loop() {
+		Default()
+	}
+}
