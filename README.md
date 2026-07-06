@@ -6,9 +6,9 @@ divider, truecolor, five built-in themes, and an optional TOML config file
 for anyone who wants to tweak it further.
 
 ```
-󰚩 Opus            high      󰍛 ⟨██████▊░░░⟩ 68%      󰔟 ⟨██▌░░░⟩ 42%      󰾔 ⟨████▎░⟩ 71%      󰈤 80% (16.0k)
- big-refactor      󰉋 /home/user/code/statusline      +342 -58       $2.17  1:23:45
- github.com/scrothers/statusline       #128 approved       main 󰔡 2  1  3 ↑ 1      󰤨 my-feature
+󰚩 Opus        high    󰍛 ⟨██████▊░░░⟩ 68%    󰔟 ⟨██▌░░░⟩ 42%    󰾔 ⟨████▎░⟩ 71%    󰈤 80% (16.0k)
+ big-refactor    󰉋 /home/user/code/statusline    +342 -58     $2.17  1:23:45
+ github.com/scrothers/statusline     #128 approved     main 󰔡 2  1  3 ↑ 1    󰤨 my-feature
 ```
 
 (a real render — `statusline demo --theme gruvbox --scenario full`)

@@ -13,10 +13,10 @@ import (
 // text joined by a plain colored divider.
 const dividerGlyph = "\uE0B1"
 
-// dividerText is the full divider run between two segments: generous
+// dividerText is the full divider run between two segments: two spaces of
 // padding on both sides of the glyph so segments read as clearly separate
 // pieces rather than crowding the chevron.
-const dividerText = "   " + dividerGlyph + "   "
+const dividerText = "  " + dividerGlyph + "  "
 
 // joinLine renders one line's segments into a single string: each
 // segment's chunks painted in sequence, with dividerText (colored
