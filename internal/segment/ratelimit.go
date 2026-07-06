@@ -9,8 +9,8 @@ import (
 )
 
 // rateLimitGaugeWidth is narrower than the context window's hero gauge
-// (contextWindowGaugeWidth) to conserve room for the rest of the Claude
-// info line.
+// (which scales with terminal width) to conserve room for the rest of the
+// Claude info line.
 const rateLimitGaugeWidth = 6
 
 // rateLimitWindow distinguishes the two independently-absent rate-limit
@@ -22,10 +22,13 @@ const (
 	windowSevenDay
 )
 
-// rateLimitSegment renders one Claude subscription rate-limit gauge.
-// FiveHour and SevenDay are registered as separate Segment instances
-// (ratelimit_5h / ratelimit_7d) since either window may be independently
-// absent from the payload.
+// rateLimitSegment renders one Claude subscription rate-limit gauge, styled
+// to match the context-window gauge: an icon, an explicit window label
+// ("5h"/"7d") so the two gauges aren't distinguishable by icon alone, a
+// bracketed bar whose filled cells follow the same fixed green-to-red
+// position gradient, and the percentage. FiveHour and SevenDay are
+// registered as separate Segment instances (ratelimit_5h / ratelimit_7d)
+// since either window may be independently absent from the payload.
 type rateLimitSegment struct {
 	window rateLimitWindow
 }
@@ -49,28 +52,34 @@ func (s rateLimitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 
 	var win *input.RateLimitWindow
-	var iconKey string
+	var iconKey, label string
 	if s.window == windowFiveHour {
 		win = rc.Payload.RateLimits.FiveHour
 		iconKey = theme.IconRateLimitFiveHour
+		label = "5h"
 	} else {
 		win = rc.Payload.RateLimits.SevenDay
 		iconKey = theme.IconRateLimitWeek
+		label = "7d"
 	}
 	if win == nil {
 		return nil, false
 	}
 
-	color := gaugeColor(rc.Theme, win.UsedPercentage)
+	color := aggregateGradientColor(rc.Theme, win.UsedPercentage)
 	filled, track := style.BlockBarParts(win.UsedPercentage, rateLimitGaugeWidth)
 	icon := theme.Glyph(iconKey, rc.Config.NerdFontEnabled())
 
-	return []style.Chunk{
-		{Text: icon, FG: color},
-		{Text: " ⟨", FG: rc.Theme.Muted},
-		{Text: filled, FG: color},
-		{Text: track, FG: rc.Theme.TrackDim},
-		{Text: "⟩", FG: rc.Theme.Muted},
-		{Text: fmt.Sprintf(" %.0f%%", win.UsedPercentage), FG: color},
-	}, true
+	chunks := make([]style.Chunk, 0, rateLimitGaugeWidth+5)
+	chunks = append(chunks,
+		style.Chunk{Text: icon + " " + label, FG: color},
+		style.Chunk{Text: " ⟨", FG: rc.Theme.Muted},
+	)
+	chunks = append(chunks, gradientBarCellChunks(rc.Theme, filled, rateLimitGaugeWidth)...)
+	chunks = append(chunks,
+		style.Chunk{Text: track, FG: rc.Theme.TrackDim},
+		style.Chunk{Text: "⟩", FG: rc.Theme.Muted},
+		style.Chunk{Text: fmt.Sprintf(" %.0f%%", win.UsedPercentage), FG: color},
+	)
+	return chunks, true
 }

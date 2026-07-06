@@ -62,17 +62,3 @@ func Registry() map[string]Segment {
 	}
 	return reg
 }
-
-// gaugeColor maps a percentage to the shared success/warning/danger
-// thresholds used by both the context-window bar and the rate-limit gauges,
-// so the same color always means the same thing across every gauge.
-func gaugeColor(th *theme.Theme, pct float64) style.Color {
-	switch {
-	case pct >= 80:
-		return th.Danger
-	case pct >= 50:
-		return th.Warning
-	default:
-		return th.Success
-	}
-}

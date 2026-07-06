@@ -70,37 +70,3 @@ func TestRegistry(t *testing.T) {
 		}
 	}
 }
-
-func TestGaugeColor(t *testing.T) {
-	t.Parallel()
-	th := testTheme(t)
-
-	tests := []struct {
-		pct  float64
-		want string
-	}{
-		{pct: 0, want: "success"},
-		{pct: 49, want: "success"},
-		{pct: 50, want: "warning"},
-		{pct: 79, want: "warning"},
-		{pct: 80, want: "danger"},
-		{pct: 100, want: "danger"},
-	}
-	for _, tt := range tests {
-		got := gaugeColor(&th, tt.pct)
-		switch tt.want {
-		case "success":
-			if got != th.Success {
-				t.Errorf("gaugeColor(%v) = %+v, want Success %+v", tt.pct, got, th.Success)
-			}
-		case "warning":
-			if got != th.Warning {
-				t.Errorf("gaugeColor(%v) = %+v, want Warning %+v", tt.pct, got, th.Warning)
-			}
-		case "danger":
-			if got != th.Danger {
-				t.Errorf("gaugeColor(%v) = %+v, want Danger %+v", tt.pct, got, th.Danger)
-			}
-		}
-	}
-}

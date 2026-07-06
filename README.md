@@ -6,7 +6,7 @@ divider, truecolor, five built-in themes, and an optional TOML config file
 for anyone who wants to tweak it further.
 
 ```
-󰚩 Opus        󰊚 high    󰍛 ⟨█████████████▋░░░░░░⟩ 68% 136.0k/64.0k    󰔟 ⟨██▌░░░⟩ 42%    󰾔 ⟨████▎░⟩ 71%    󰈤 79% (108.0k)
+󰚩 Opus        󰊚 high    󰍛 ⟨█████████████▋░░░░░░⟩ 68% 136.0k/64.0k    󰔟 5h ⟨██▌░░░⟩ 42%    󰾔 7d ⟨████▎░⟩ 71%    󰈤 79% (108.0k)
  big-refactor    󰉋 /home/user/code/statusline    +342 -58     $2.17  1:23:45
  github.com/scrothers/statusline     #128 approved     main 󰔡 2  1  3 ↑ 1    󰤨 my-feature
 ```
@@ -94,16 +94,18 @@ escalates from an empty gauge (`low`) through a full gauge (`xhigh`) to fire
 purple scale independent of the active theme, so "getting hotter" reads the
 same everywhere.
 
-`context_window`'s bar width scales with the detected terminal width
-(clamped between 8 and 24 cells) instead of a fixed size. Each cell's color
-is fixed by its position along the bar — green on the left sliding through
-warning to danger on the right — so filling the bar reveals more of a
-stable on-screen gradient from the left rather than shifting every already-
-filled cell's color together each time the percentage changes. (The icon
-and percentage text use a separate smooth gradient based on the overall
-percentage.) Rate-limit gauges still use flat threshold-band coloring. The
-context bar also shows a `used/remaining` token count next to the
-percentage whenever the context window size is known.
+`context_window` and the two `ratelimit_*` gauges share the same bar
+treatment: `context_window`'s width scales with the detected terminal width
+(clamped between 8 and 24 cells); the rate-limit bars stay a fixed, narrower
+6 cells and are explicitly labeled `5h`/`7d` so the two aren't
+distinguishable by icon alone. On all three, each bar cell's color is fixed
+by its position along the bar — green on the left sliding through warning
+to danger on the right — so filling the bar reveals more of a stable
+on-screen gradient from the left rather than shifting every already-filled
+cell's color together each time the percentage changes. (Each gauge's icon
+and percentage text use a separate smooth gradient based on its own overall
+percentage.) The context bar also shows a `used/remaining` token count next
+to the percentage whenever the context window size is known.
 
 ## Themes
 
