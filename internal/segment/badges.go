@@ -101,22 +101,6 @@ func (agentSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	return []style.Chunk{{Text: text, FG: rc.Theme.Muted}}, true
 }
 
-// effortSegment renders the current reasoning effort level in the theme's
-// identity accent, since effort is a setting (a fact), not a state — it
-// never turns red/green.
-type effortSegment struct{}
-
-func (effortSegment) ID() string { return "effort" }
-
-func (effortSegment) Priority() int { return 40 }
-
-func (effortSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
-	if rc.Payload.Effort == nil || rc.Payload.Effort.Level == "" {
-		return nil, false
-	}
-	return []style.Chunk{{Text: rc.Payload.Effort.Level, FG: rc.Theme.IdentityAccent}}, true
-}
-
 // outputStyleSegment renders the current output style name, skipping the
 // common "default" style since it carries no information.
 type outputStyleSegment struct{}

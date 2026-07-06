@@ -31,6 +31,12 @@ const (
 	IconSessionName       = "session_name"
 	IconRepo              = "repo"
 	IconWorktree          = "worktree"
+	IconEffortLow         = "effort_low"
+	IconEffortMedium      = "effort_medium"
+	IconEffortHigh        = "effort_high"
+	IconEffortXHigh       = "effort_xhigh"
+	IconEffortMax         = "effort_max"
+	IconEffortUltra       = "effort_ultra"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -77,6 +83,12 @@ var Icons = map[string]Icon{
 	IconSessionName:       {Glyph: "\uF02B", Fallback: "session:"},      // nf-fa-tag
 	IconRepo:              {Glyph: "\uF401", Fallback: "repo:"},         // nf-oct-repo
 	IconWorktree:          {Glyph: "\U000F0928", Fallback: "worktree:"}, // nf-md-source_branch (approx)
+	IconEffortLow:         {Glyph: "\U000F0873", Fallback: "low"},       // nf-md-gauge_empty
+	IconEffortMedium:      {Glyph: "\U000F0875", Fallback: "medium"},    // nf-md-gauge_low
+	IconEffortHigh:        {Glyph: "\U000F029A", Fallback: "high"},      // nf-md-gauge
+	IconEffortXHigh:       {Glyph: "\U000F0874", Fallback: "xhigh"},     // nf-md-gauge_full
+	IconEffortMax:         {Glyph: "\U000F0238", Fallback: "max"},       // nf-md-fire
+	IconEffortUltra:       {Glyph: "\U000F15D7", Fallback: "ultra"},     // nf-md-fire_alert
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,

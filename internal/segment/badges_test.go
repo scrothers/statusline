@@ -97,33 +97,6 @@ func TestAgentSegment(t *testing.T) {
 	})
 }
 
-func TestEffortSegment(t *testing.T) {
-	t.Parallel()
-
-	t.Run("absent effort is omitted", func(t *testing.T) {
-		t.Parallel()
-		rc := newTestContext(t, &input.Payload{}, nil)
-		if _, ok := (effortSegment{}).Render(rc); ok {
-			t.Error("Render() ok = true, want false for nil Effort")
-		}
-	})
-
-	t.Run("renders effort level as plain text", func(t *testing.T) {
-		t.Parallel()
-		rc := newTestContext(t, &input.Payload{Effort: &input.Effort{Level: "high"}}, nil)
-		chunks, ok := (effortSegment{}).Render(rc)
-		if !ok {
-			t.Fatal("Render() ok = false, want true")
-		}
-		if chunkText(chunks) != "high" {
-			t.Errorf("rendered text = %q, want high", chunkText(chunks))
-		}
-		if chunks[0].FG != rc.Theme.IdentityAccent {
-			t.Errorf("FG = %+v, want identity accent %+v", chunks[0].FG, rc.Theme.IdentityAccent)
-		}
-	})
-}
-
 func TestOutputStyleSegment(t *testing.T) {
 	t.Parallel()
 

@@ -6,7 +6,7 @@ divider, truecolor, five built-in themes, and an optional TOML config file
 for anyone who wants to tweak it further.
 
 ```
-󰚩 Opus        high    󰍛 ⟨██████▊░░░⟩ 68%    󰔟 ⟨██▌░░░⟩ 42%    󰾔 ⟨████▎░⟩ 71%    󰈤 80% (16.0k)
+󰚩 Opus        󰊚 high    󰍛 ⟨██████▊░░░⟩ 68%    󰔟 ⟨██▌░░░⟩ 42%    󰾔 ⟨████▎░⟩ 71%    󰈤 80% (16.0k)
  big-refactor    󰉋 /home/user/code/statusline    +342 -58     $2.17  1:23:45
  github.com/scrothers/statusline     #128 approved     main 󰔡 2  1  3 ↑ 1    󰤨 my-feature
 ```
@@ -87,6 +87,12 @@ no background either — they just aren't wired into any line by default.
 
 Under width pressure, segments drop in priority order (lowest first) until
 a line fits; model and directory never drop, only self-truncate.
+
+`effort` is the one segment colored by intensity rather than theme: its icon
+escalates from an empty gauge (`low`) through a full gauge (`xhigh`) to fire
+(`max`) and an alert fire (`ultra`), and its color runs a fixed green → red →
+purple scale independent of the active theme, so "getting hotter" reads the
+same everywhere.
 
 ## Themes
 
