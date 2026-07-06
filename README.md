@@ -6,12 +6,12 @@ five built-in themes, and an optional TOML config file for anyone who wants
 to tweak it further.
 
 ```
- 󰚩 Opus  󰉋 ~/code/statusline 
-  master 12   #128 
- 󰍛 ⟨██████▊░░░⟩ 68%  $0.42 1:23:45  󰔟██▌░░░ 42%  󰾔████▎░ 71%  INSERT · 󰤄 reviewer · high
+ 󰚩 Opus  󰉋 /home/user/code/statusline 
+  main 󰔡2 1 3 ↑1    #128 
+ 󰍛 ⟨██████▊░░░⟩ 68%   $2.17 1:23:45   󰔟██▌░░░ 42%  󰾔████▎░ 71%  INSERT · 󰤄 reviewer · high
 ```
 
-(a real render — captured from this project's own working tree)
+(a real render — `statusline demo --theme gruvbox --scenario full`)
 
 ## Install
 
@@ -112,6 +112,20 @@ enabled = false
 
 [theme_overrides]
 success = "#00ff00"
+```
+
+If you take over `lines[].segments` entirely, `"gap"` is a reserved entry
+that inserts breathing room — a plain space tapering to the terminal's own
+background on both sides — before the next segment, instead of the usual
+connector. It's what separates unrelated clusters that would otherwise glue
+together just because they share a background color (e.g. the context bar
+from cost+duration on the default vitals line); it never adds background
+color, only a real gap:
+
+```toml
+[[lines]]
+enabled = true
+segments = ["context_window", "gap", "cost", "gap", "ratelimit_5h", "ratelimit_7d"]
 ```
 
 ## Requirements

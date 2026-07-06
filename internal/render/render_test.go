@@ -158,3 +158,53 @@ func (panickingSegment) Priority() int { return 0 }
 func (panickingSegment) Render(*segment.RenderContext) ([]style.Chunk, bool) {
 	panic("boom")
 }
+
+// fakeSegment renders a single fixed chunk, for tests that need to control
+// exactly which segments share a background color.
+type fakeSegment struct {
+	id       string
+	priority int
+	text     string
+	bg       style.Color
+}
+
+func (f fakeSegment) ID() string    { return f.id }
+func (f fakeSegment) Priority() int { return f.priority }
+func (f fakeSegment) Render(*segment.RenderContext) ([]style.Chunk, bool) {
+	return []style.Chunk{{Text: f.text, BG: f.bg}}, true
+}
+
+func TestRenderLine_gapMarkerForcesBreakBetweenSameBGSegments(t *testing.T) {
+	t.Setenv("NO_COLOR", "1")
+	bg := style.RGB(9, 9, 9)
+	registry := map[string]segment.Segment{
+		"alpha": fakeSegment{id: "alpha", priority: 90, text: "ALPHA", bg: bg},
+		"beta":  fakeSegment{id: "beta", priority: 80, text: "BETA", bg: bg},
+	}
+	cfg := config.Config{Separator: config.SeparatorConfig{Style: "rounded"}}
+	th := theme.Theme{}
+	rc := &segment.RenderContext{Payload: &input.Payload{}, Config: &cfg, Theme: &th, Columns: 200}
+
+	withoutGap := renderLine(rc, registry, []string{"alpha", "beta"})
+	withGap := renderLine(rc, registry, []string{"alpha", GapMarker, "beta"})
+
+	if strings.Contains(withoutGap, " ") {
+		t.Errorf("chained same-bg segments should have no plain space: %q", withoutGap)
+	}
+	if !strings.Contains(withGap, " ") {
+		t.Errorf("%q marker should introduce a plain space: %q", GapMarker, withGap)
+	}
+	for _, got := range []string{withoutGap, withGap} {
+		if !strings.Contains(got, "ALPHA") || !strings.Contains(got, "BETA") {
+			t.Errorf("renderLine() missing content: %q", got)
+		}
+	}
+}
+
+func TestRenderLine_gapMarkerAloneProducesNothing(t *testing.T) {
+	t.Setenv("NO_COLOR", "1")
+	rc := &segment.RenderContext{Payload: &input.Payload{}, Config: &config.Config{}, Theme: &theme.Theme{}, Columns: 200}
+	if got := renderLine(rc, segment.Registry(), []string{GapMarker}); got != "" {
+		t.Errorf("renderLine() with only a gap marker = %q, want empty", got)
+	}
+}

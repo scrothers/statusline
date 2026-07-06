@@ -10,11 +10,11 @@ segments = ["model", "directory"]
 
 [[lines]]
 enabled = true
-segments = ["git", "pr"]
+segments = ["git", "gap", "pr"]
 
 [[lines]]
 enabled = true
-segments = ["context_window", "cost", "ratelimit_5h", "ratelimit_7d", "vim", "agent", "effort", "output_style"]
+segments = ["context_window", "gap", "cost", "gap", "ratelimit_5h", "ratelimit_7d", "gap", "vim", "agent", "effort", "output_style"]
 
 [git]
 enabled = true

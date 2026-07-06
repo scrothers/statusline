@@ -41,6 +41,11 @@ func capsFor(styleName string) capGlyphs {
 //     terminal's own background, plus a plain space, since a badge has no
 //     background to connect to.
 //   - badge → badge (neither bg.Valid): a plain " · " divider in muted.
+//   - breakBefore is set (an explicit "gap" between unrelated clusters that
+//     otherwise share a background color, e.g. the context-window gauge vs.
+//     cost+duration): the same taper-space-taper treatment as pill → badge,
+//     regardless of whether either side is actually a pill. This is
+//     breathing room via *plain space*, never extra painted background.
 //
 // The first segment gets a leading opening cap (if it's a pill) and the
 // last gets a trailing closing cap tapering to the terminal default,
@@ -60,6 +65,14 @@ func joinLine(segments []lineSegment, capStyleName string, muted style.Color) st
 		} else {
 			prev := segments[i-1]
 			switch {
+			case seg.breakBefore:
+				if prev.bg.Valid {
+					b.WriteString(style.Paint(caps.Close, prev.bg, style.Default, false))
+				}
+				b.WriteString(" ")
+				if seg.bg.Valid {
+					b.WriteString(style.Paint(caps.Open, seg.bg, style.Default, false))
+				}
 			case prev.bg.Valid && seg.bg.Valid:
 				b.WriteString(style.Paint(caps.Close, prev.bg, seg.bg, false))
 			case prev.bg.Valid && !seg.bg.Valid:

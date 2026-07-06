@@ -52,6 +52,24 @@ func TestJoinLine(t *testing.T) {
 		}
 	})
 
+	t.Run("gap forces a real space between two same-bg pills, no color merge", func(t *testing.T) {
+		bg := style.RGB(9, 9, 9)
+		plain := joinLine([]lineSegment{pillSegment("a", 90, "AB", bg), pillSegment("b", 80, "CD", bg)}, "rounded", muted)
+		gapped := joinLine([]lineSegment{pillSegment("a", 90, "AB", bg), withBreakBefore(pillSegment("b", 80, "CD", bg))}, "rounded", muted)
+
+		if strings.Contains(plain, " ") {
+			t.Errorf("two chained same-bg pills should have no plain space between them: %q", plain)
+		}
+		if !strings.Contains(gapped, " ") {
+			t.Errorf("breakBefore should introduce a plain space: %q", gapped)
+		}
+		for _, got := range []string{plain, gapped} {
+			if !strings.Contains(got, "AB") || !strings.Contains(got, "CD") {
+				t.Errorf("joined output missing content: %q", got)
+			}
+		}
+	})
+
 	t.Run("all segment text survives regardless of style", func(t *testing.T) {
 		segs := []lineSegment{
 			pillSegment("model", 100, "Opus", style.RGB(1, 2, 3)),

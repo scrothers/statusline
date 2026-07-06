@@ -28,9 +28,22 @@ func Render(rc *segment.RenderContext, registry map[string]segment.Segment) stri
 	return strings.Join(lines, "\n")
 }
 
+// GapMarker is a reserved entry in a LineConfig's Segments list: it inserts
+// breathing room (a plain-space break tapering to the terminal's default
+// background on both sides) before the next segment, instead of the normal
+// connector — for unrelated clusters that would otherwise glue together
+// silently because they happen to share a background color. It never adds
+// background color; it's a real gap.
+const GapMarker = "gap"
+
 func renderLine(rc *segment.RenderContext, registry map[string]segment.Segment, ids []string) string {
 	segments := make([]lineSegment, 0, len(ids))
+	pendingGap := false
 	for _, id := range ids {
+		if id == GapMarker {
+			pendingGap = true
+			continue
+		}
 		seg, ok := registry[id]
 		if !ok {
 			continue
@@ -42,7 +55,11 @@ func renderLine(rc *segment.RenderContext, registry map[string]segment.Segment, 
 		if len(chunks) == 0 {
 			continue
 		}
-		segments = append(segments, lineSegment{id: id, priority: seg.Priority(), chunks: chunks, bg: chunks[0].BG})
+		segments = append(segments, lineSegment{
+			id: id, priority: seg.Priority(), chunks: chunks, bg: chunks[0].BG,
+			breakBefore: pendingGap,
+		})
+		pendingGap = false
 	}
 
 	segments = fitToWidth(segments, rc.Columns)

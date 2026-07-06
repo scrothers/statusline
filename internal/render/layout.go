@@ -18,6 +18,15 @@ type lineSegment struct {
 	priority int
 	chunks   []style.Chunk
 	bg       style.Color // uniform background across the segment's chunks
+
+	// breakBefore forces a hard gap (taper to the terminal's default
+	// background, a plain space, taper back in) before this segment even
+	// when it shares a background color with the previous one — the config
+	// "gap" marker between unrelated clusters on the same line (e.g. the
+	// context-window gauge vs. cost+duration) sets this rather than relying
+	// on a background-color difference, so breathing room never means
+	// painting more background color.
+	breakBefore bool
 }
 
 func chunksWidth(chunks []style.Chunk) int {
@@ -30,8 +39,10 @@ func chunksWidth(chunks []style.Chunk) int {
 
 // lineWidth estimates the rendered width of a line including join glyphs:
 // one cell for a pill-to-pill connector or an end cap, two for a pill/badge
-// transition (a closing or opening cap plus a plain space), and three for a
-// " · " divider between two badges.
+// transition (a closing or opening cap plus a plain space), three for a
+// " · " divider between two badges, and a breakBefore gap costs one cap per
+// side that's a pill plus the space between (so 1-3 cells, symmetric with
+// the transition it's forcing).
 func lineWidth(segments []lineSegment) int {
 	if len(segments) == 0 {
 		return 0
@@ -44,6 +55,14 @@ func lineWidth(segments []lineSegment) int {
 		}
 		prev := segments[i-1]
 		switch {
+		case s.breakBefore:
+			if prev.bg.Valid {
+				total++
+			}
+			total++ // the gap itself
+			if s.bg.Valid {
+				total++
+			}
 		case prev.bg.Valid && s.bg.Valid:
 			total++
 		case prev.bg.Valid != s.bg.Valid:

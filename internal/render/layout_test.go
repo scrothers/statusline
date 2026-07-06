@@ -14,6 +14,11 @@ func badgeSegment(id string, priority int, text string) lineSegment {
 	return lineSegment{id: id, priority: priority, chunks: []style.Chunk{{Text: text, BG: style.Default}}, bg: style.Default}
 }
 
+func withBreakBefore(s lineSegment) lineSegment {
+	s.breakBefore = true
+	return s
+}
+
 func TestChunksWidth(t *testing.T) {
 	t.Parallel()
 	chunks := []style.Chunk{{Text: "abc"}, {Text: "def"}}
@@ -51,6 +56,22 @@ func TestLineWidth(t *testing.T) {
 			name: "two badges: content + divider, no caps",
 			segs: []lineSegment{badgeSegment("a", 30, "ab"), badgeSegment("b", 30, "cd")},
 			want: 2 + 2 + 3,
+		},
+		{
+			name: "gap between two same-bg pills forces a taper instead of a connector",
+			segs: []lineSegment{
+				pillSegment("a", 90, "ab", bg),
+				withBreakBefore(pillSegment("b", 80, "cd", bg)),
+			},
+			want: 2 + 2 /*content*/ + 2 /*outer open/close caps*/ + 1 /*taper close*/ + 1 /*gap space*/ + 1, /*taper open*/
+		},
+		{
+			name: "gap before a badge costs the same as a natural pill-badge transition",
+			segs: []lineSegment{
+				pillSegment("a", 90, "ab", bg),
+				withBreakBefore(badgeSegment("b", 30, "cd")),
+			},
+			want: 2 + 2 /*content*/ + 1 /*outer open cap*/ + 1 /*taper close*/ + 1, /*gap space, no open cap for a badge*/
 		},
 	}
 
