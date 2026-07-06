@@ -7,7 +7,7 @@ import (
 	"github.com/scrothers/statusline/internal/theme"
 )
 
-// costSegment renders session cost and clock-style elapsed duration.
+// costSegment renders total session cost in USD.
 type costSegment struct{}
 
 func (costSegment) ID() string { return "cost" }
@@ -22,11 +22,30 @@ func (costSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	nerd := rc.Config.NerdFontEnabled()
 	costText := fmt.Sprintf("%.2f", cost.TotalCostUSD)
-	durText := formatClock(cost.TotalDurationMS)
 
 	return []style.Chunk{
 		{Text: theme.Glyph(theme.IconCost, nerd) + costText, FG: rc.Theme.Info},
-		{Text: " " + theme.Glyph(theme.IconDuration, nerd) + " " + durText, FG: rc.Theme.Info},
+	}, true
+}
+
+// durationSegment renders clock-style elapsed session duration.
+type durationSegment struct{}
+
+func (durationSegment) ID() string { return "duration" }
+
+func (durationSegment) Priority() int { return 65 }
+
+func (durationSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
+	cost := rc.Payload.Cost
+	if cost == nil {
+		return nil, false
+	}
+
+	nerd := rc.Config.NerdFontEnabled()
+	durText := formatClock(cost.TotalDurationMS)
+
+	return []style.Chunk{
+		{Text: theme.Glyph(theme.IconDuration, nerd) + " " + durText, FG: rc.Theme.Info},
 	}, true
 }
 

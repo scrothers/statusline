@@ -50,7 +50,7 @@ func TestLinesChangedSegment(t *testing.T) {
 		}
 	})
 
-	t.Run("renders both added and removed", func(t *testing.T) {
+	t.Run("renders both added and removed with no ASCII sign", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalLinesAdded: 342, TotalLinesRemoved: 58}}, nil)
 		chunks, ok := (linesChangedSegment{}).Render(rc)
@@ -58,8 +58,26 @@ func TestLinesChangedSegment(t *testing.T) {
 			t.Fatal("Render() ok = false, want true")
 		}
 		text := chunkText(chunks)
-		if !strings.Contains(text, "+342") || !strings.Contains(text, "-58") {
-			t.Errorf("rendered text = %q, want it to contain +342 and -58", text)
+		if !strings.Contains(text, "342") || !strings.Contains(text, "58") {
+			t.Errorf("rendered text = %q, want it to contain 342 and 58", text)
+		}
+		if strings.ContainsAny(text, "+-") {
+			t.Errorf("rendered text = %q, want no ASCII +/- (the icons alone carry that meaning)", text)
+		}
+	})
+
+	t.Run("leads with the pencil icon in warning color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalLinesAdded: 342, TotalLinesRemoved: 58}}, nil)
+		chunks, ok := (linesChangedSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) == 0 {
+			t.Fatal("Render() produced no chunks")
+		}
+		if chunks[0].FG != rc.Theme.Warning {
+			t.Errorf("FG = %+v, want theme.Warning %+v", chunks[0].FG, rc.Theme.Warning)
 		}
 	})
 
@@ -70,8 +88,8 @@ func TestLinesChangedSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		if strings.Contains(chunkText(chunks), "-") {
-			t.Errorf("rendered text = %q, should not contain a removed count", chunkText(chunks))
+		if !strings.Contains(chunkText(chunks), "10") {
+			t.Errorf("rendered text = %q, want it to contain 10", chunkText(chunks))
 		}
 	})
 
@@ -82,8 +100,8 @@ func TestLinesChangedSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		if strings.Contains(chunkText(chunks), "+") {
-			t.Errorf("rendered text = %q, should not contain an added count", chunkText(chunks))
+		if !strings.Contains(chunkText(chunks), "5") {
+			t.Errorf("rendered text = %q, want it to contain 5", chunkText(chunks))
 		}
 	})
 }

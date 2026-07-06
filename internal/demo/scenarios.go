@@ -64,8 +64,8 @@ func minimalScenario() Scenario {
 
 // fullScenario exercises every default-layout segment at once: the Claude
 // line (model/thinking/effort/context/rate-limits/cache), the session line
-// (session name/directory/lines changed/cost), and the git line
-// (repo/PR/branch+status/worktree).
+// (session name/directory/lines changed/token counts/cost/duration), and the
+// git line (repo/PR/branch+status/worktree).
 func fullScenario() Scenario {
 	return Scenario{
 		Name: "full",
@@ -81,6 +81,7 @@ func fullScenario() Scenario {
 				UsedPercentage:    new(float64(68)),
 				ContextWindowSize: 200_000,
 				TotalInputTokens:  136_000,
+				TotalOutputTokens: 24_000,
 				CurrentUsage:      &input.Usage{InputTokens: 20_000, CacheCreationInputTokens: 8_000, CacheReadInputTokens: 108_000},
 			},
 			RateLimits: &input.RateLimits{

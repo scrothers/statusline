@@ -7,7 +7,7 @@ segments = ["model", "thinking", "effort", "context_window", "ratelimit_5h", "ra
 
 [[lines]]
 enabled = true
-segments = ["session_name", "directory", "lines_changed", "cost"]
+segments = ["session_name", "directory", "lines_changed", "token_counts", "cost", "duration"]
 
 [[lines]]
 enabled = true

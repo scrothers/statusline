@@ -30,8 +30,9 @@ func testRenderContext(t *testing.T, payload *input.Payload, columns int) *segme
 
 // fullPayload exercises every default-layout segment at once: the Claude
 // line (model/thinking/effort/context/rate-limits/cache), the session line
-// (session name/directory/lines changed/cost), and the git line
-// (repo/PR/branch/worktree — branch comes from rc.Git, set by callers).
+// (session name/directory/lines changed/token counts/cost/duration), and the
+// git line (repo/PR/branch/worktree — branch comes from rc.Git, set by
+// callers).
 func fullPayload() *input.Payload {
 	return &input.Payload{
 		SessionName: "big-refactor",
@@ -42,8 +43,10 @@ func fullPayload() *input.Payload {
 		},
 		Cost: &input.Cost{TotalCostUSD: 1.23, TotalDurationMS: 754_000, TotalLinesAdded: 342, TotalLinesRemoved: 58},
 		ContextWindow: &input.ContextWindow{
-			UsedPercentage: new(float64(42)),
-			CurrentUsage:   &input.Usage{InputTokens: 1000, CacheCreationInputTokens: 1000, CacheReadInputTokens: 8000},
+			UsedPercentage:    new(float64(42)),
+			TotalInputTokens:  136_000,
+			TotalOutputTokens: 24_000,
+			CurrentUsage:      &input.Usage{InputTokens: 1000, CacheCreationInputTokens: 1000, CacheReadInputTokens: 8000},
 		},
 		RateLimits: &input.RateLimits{
 			FiveHour: &input.RateLimitWindow{UsedPercentage: 30},
@@ -65,7 +68,7 @@ func TestRender_fullPayload(t *testing.T) {
 
 	for _, want := range []string{
 		"Opus", "high", "42%", "30%", "71%", "80%", "8.0k", // Claude line
-		"big-refactor", "statusline", "+342", "-58", "1.23", // session line
+		"big-refactor", "statusline", "342", "58", "136.0k", "24.0k", "1.23", "12:34", // session line
 		"github.com", "scrothers", "128", "approved", "main", "my-feature", // git line
 	} {
 		if !strings.Contains(got, want) {

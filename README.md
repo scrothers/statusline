@@ -7,7 +7,7 @@ for anyone who wants to tweak it further.
 
 ```
 [38;2;254;128;25m󰚩[0m[38;2;213;196;161m Opus[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;146;131;116m    [0m[38;2;241;196;15m󰊚 high[0m[38;2;146;131;116m    [0m[38;2;250;147;48m󰍛[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;190;187;38m█[0m[38;2;197;187;39m█[0m[38;2;204;187;40m█[0m[38;2;211;187;41m█[0m[38;2;218;188;42m█[0m[38;2;225;188;43m█[0m[38;2;232;188;44m█[0m[38;2;239;188;45m█[0m[38;2;246;188;46m█[0m[38;2;250;182;47m█[0m[38;2;250;170;47m█[0m[38;2;250;158;48m█[0m[38;2;250;146;48m▋[0m[38;2;80;73;69m░░░░░░[0m[38;2;146;131;116m⟩ [0m[38;2;250;147;48m68%[0m[38;2;146;131;116m 136.0k/64.0k[0m[38;2;146;131;116m    [0m[38;2;239;188;45m 5h[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;210;187;41m█[0m[38;2;236;188;45m▌[0m[38;2;80;73;69m░░░[0m[38;2;146;131;116m⟩[0m[38;2;239;188;45m 42%[0m[38;2;146;131;116m    [0m[38;2;250;140;49m󰨳 7d[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;210;187;41m█[0m[38;2;236;188;45m█[0m[38;2;250;165;48m█[0m[38;2;250;119;50m▎[0m[38;2;80;73;69m░[0m[38;2;146;131;116m⟩[0m[38;2;250;140;49m 71%[0m[38;2;146;131;116m    [0m[38;2;142;192;124m 79% (108.0k)[0m
-[38;2;254;128;25m[0m[38;2;213;196;161m big-refactor[0m[38;2;146;131;116m    [0m[38;2;254;128;25m󰉋[0m[38;2;213;196;161m /home/user/code/statusline[0m[38;2;146;131;116m    [0m[38;2;184;187;38m +342[0m[38;2;251;73;52m  -58[0m[38;2;146;131;116m    [0m[38;2;142;192;124m2.17[0m[38;2;142;192;124m  1:23:45[0m
+[38;2;254;128;25m[0m[38;2;213;196;161m big-refactor[0m[38;2;146;131;116m    [0m[38;2;254;128;25m󰉋[0m[38;2;213;196;161m /home/user/code/statusline[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;184;187;38m  342[0m[38;2;251;73;52m  58[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;184;187;38m  136.0k[0m[38;2;251;73;52m  24.0k[0m[38;2;146;131;116m    [0m[38;2;142;192;124m2.17[0m[38;2;146;131;116m    [0m[38;2;142;192;124m 1:23:45[0m
 [38;2;254;128;25m[0m[38;2;146;131;116m github.com[0m[38;2;213;196;161m/scrothers[0m[38;2;235;219;178m/statusline[0m[38;2;146;131;116m    [0m[38;2;184;187;38m #128[0m[38;2;184;187;38m approved[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;235;219;178m main[0m[38;2;184;187;38m 󰔡 2[0m[38;2;250;189;47m  1[0m[38;2;146;131;116m  3[0m[38;2;184;187;38m ↑ 1[0m[38;2;146;131;116m    [0m[38;2;142;192;124m󰤨 my-feature[0m
 ```
 
@@ -78,7 +78,7 @@ text joined by a thin chevron divider ( `` ), not powerline pills.
 | Line | Segments | Notes |
 |---|---|---|
 | 1 — Claude | model, thinking, effort, context window, rate limits (5h/7d), cache | The model's own state: what it's running, how hard, and how much room/budget is left. |
-| 2 — session | session name, directory, lines added/removed, session cost + duration | Omitted fields (no custom name, no diff yet) just don't appear. |
+| 2 — session | session name, directory, lines added/removed, token counts, cost, duration | Omitted fields (no custom name, no diff yet) just don't appear. |
 | 3 — git | repo (host/owner/name), open PR (number + review state), branch + status, worktree | The whole line disappears outside a git repository. |
 
 Segments not in the default layout but still available via custom config:
@@ -106,6 +106,11 @@ cell's color together each time the percentage changes. (Each gauge's icon
 and percentage text use a separate smooth gradient based on its own overall
 percentage.) The context bar also shows a `used/remaining` token count next
 to the percentage whenever the context window size is known.
+
+`lines_changed` and `token_counts` share a format: a prefix icon (pencil for
+lines, coins for tokens) followed by counts whose diff-added/diff-removed
+icons alone carry the +/- meaning — the numbers themselves have no ASCII
+sign.
 
 ## Themes
 

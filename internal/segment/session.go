@@ -1,7 +1,7 @@
 package segment
 
 import (
-	"fmt"
+	"strconv"
 
 	"github.com/scrothers/statusline/internal/style"
 	"github.com/scrothers/statusline/internal/theme"
@@ -27,7 +27,10 @@ func (sessionNameSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 }
 
 // linesChangedSegment renders the session's total added/removed line
-// counts. Omitted when there's no cost data yet, or nothing has changed.
+// counts, prefixed with a pencil to mark it as an edit tally. The
+// diff-added/diff-removed icons alone carry the +/- meaning, so the counts
+// themselves are plain numbers with no ASCII sign. Omitted when there's no
+// cost data yet, or nothing has changed.
 type linesChangedSegment struct{}
 
 func (linesChangedSegment) ID() string { return "lines_changed" }
@@ -41,19 +44,22 @@ func (linesChangedSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 
 	nerd := rc.Config.NerdFontEnabled()
-
-	var chunks []style.Chunk
+	chunks := []style.Chunk{
+		{Text: theme.Glyph(theme.IconEditPencil, nerd), FG: rc.Theme.Warning},
+	}
 	if cost.TotalLinesAdded > 0 {
 		icon := theme.Glyph(theme.IconLinesAdded, nerd)
-		chunks = append(chunks, style.Chunk{Text: fmt.Sprintf("%s +%d", icon, cost.TotalLinesAdded), FG: rc.Theme.Success})
+		chunks = append(chunks, style.Chunk{
+			Text: " " + icon + " " + strconv.Itoa(cost.TotalLinesAdded),
+			FG:   rc.Theme.Success,
+		})
 	}
 	if cost.TotalLinesRemoved > 0 {
 		icon := theme.Glyph(theme.IconLinesRemoved, nerd)
-		text := fmt.Sprintf("%s -%d", icon, cost.TotalLinesRemoved)
-		if len(chunks) > 0 {
-			text = " " + text
-		}
-		chunks = append(chunks, style.Chunk{Text: text, FG: rc.Theme.Danger})
+		chunks = append(chunks, style.Chunk{
+			Text: " " + icon + " " + strconv.Itoa(cost.TotalLinesRemoved),
+			FG:   rc.Theme.Danger,
+		})
 	}
 	return chunks, true
 }

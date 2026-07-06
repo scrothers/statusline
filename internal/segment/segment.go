@@ -42,6 +42,7 @@ func Registry() map[string]Segment {
 		gitSegment{},
 		contextWindowSegment{},
 		costSegment{},
+		durationSegment{},
 		newRateLimitSegment(windowFiveHour),
 		newRateLimitSegment(windowSevenDay),
 		prSegment{},
@@ -53,6 +54,7 @@ func Registry() map[string]Segment {
 		cacheSegment{},
 		sessionNameSegment{},
 		linesChangedSegment{},
+		tokenCountsSegment{},
 		repoSegment{},
 		worktreeSegment{},
 	}
