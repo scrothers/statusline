@@ -46,7 +46,16 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	pctText := fmt.Sprintf("%.0f%%", pct)
 	countsText := contextWindowCountsText(cw)
 
-	if rc.Payload.Exceeds200k || pct >= contextAlertThreshold {
+	// Exceeds200k fires once raw usage crosses a fixed 200k tokens,
+	// regardless of the model's actual window size — on a 1M-token window
+	// that's just 20% used, not an alarm. It's only a meaningful signal
+	// when there's no real window size to compute an accurate percentage
+	// against; otherwise the percentage threshold alone decides.
+	alert := pct >= contextAlertThreshold
+	if cw.ContextWindowSize <= 0 {
+		alert = alert || rc.Payload.Exceeds200k
+	}
+	if alert {
 		icon := theme.Glyph(theme.IconContextAlert, nerd)
 		text := icon + " " + filled + track + " " + pctText + countsText
 		return []style.Chunk{{Text: text, FG: rc.Theme.Danger, Bold: true}}, true

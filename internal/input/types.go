@@ -16,14 +16,17 @@ type Payload struct {
 	OutputStyle    *OutputStyle   `json:"output_style"`
 	Cost           *Cost          `json:"cost"`
 	ContextWindow  *ContextWindow `json:"context_window"`
-	Exceeds200k    bool           `json:"exceeds_200k_tokens"`
-	Effort         *Effort        `json:"effort"`
-	Thinking       *Thinking      `json:"thinking"`
-	RateLimits     *RateLimits    `json:"rate_limits"`
-	Vim            *Vim           `json:"vim"`
-	Agent          *Agent         `json:"agent"`
-	PR             *PR            `json:"pr"`
-	Worktree       *Worktree      `json:"worktree"`
+	// Exceeds200k fires once raw usage crosses a fixed 200k tokens,
+	// regardless of the model's actual context window size — meaningless
+	// on its own for a >200k window, see context_window's alert logic.
+	Exceeds200k bool        `json:"exceeds_200k_tokens"`
+	Effort      *Effort     `json:"effort"`
+	Thinking    *Thinking   `json:"thinking"`
+	RateLimits  *RateLimits `json:"rate_limits"`
+	Vim         *Vim        `json:"vim"`
+	Agent       *Agent      `json:"agent"`
+	PR          *PR         `json:"pr"`
+	Worktree    *Worktree   `json:"worktree"`
 }
 
 // Model identifies the current model backing the session.

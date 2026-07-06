@@ -202,7 +202,7 @@ func TestContextWindowSegment(t *testing.T) {
 		}
 	})
 
-	t.Run("alarm tier on exceeds_200k_tokens regardless of percentage", func(t *testing.T) {
+	t.Run("alarm tier on exceeds_200k_tokens when the window size is unknown", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
 			ContextWindow: &input.ContextWindow{UsedPercentage: new(float64(10))},
@@ -217,6 +217,28 @@ func TestContextWindowSegment(t *testing.T) {
 		}
 		if !chunks[0].Bold {
 			t.Error("alarm tier should render bold")
+		}
+	})
+
+	t.Run("exceeds_200k_tokens is ignored on a large known window with low usage", func(t *testing.T) {
+		t.Parallel()
+		// A 1M-token window at 22% used has already crossed the fixed
+		// 200k-token mark Exceeds200k fires at, but that's not remotely an
+		// alarm situation — the real percentage against the real window
+		// size must win.
+		rc := newTestContext(t, &input.Payload{
+			ContextWindow: &input.ContextWindow{
+				ContextWindowSize: 1_000_000,
+				UsedPercentage:    new(float64(22)),
+			},
+			Exceeds200k: true,
+		}, nil)
+		chunks, ok := (contextWindowSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if chunks[0].Bold {
+			t.Error("should not render the alarm tier (bold) just because exceeds_200k_tokens is true on a large window")
 		}
 	})
 
