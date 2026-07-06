@@ -41,7 +41,10 @@ const (
 	IconLinesAdded        = "lines_added"
 	IconLinesRemoved      = "lines_removed"
 	IconEditPencil        = "edit_pencil"
-	IconTokensCoin        = "tokens_coin"
+	IconTokensTicket      = "tokens_ticket"
+	IconTokensInput       = "tokens_input"
+	IconTokensOutput      = "tokens_output"
+	IconTokensCacheCreate = "tokens_cache_create"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -98,7 +101,10 @@ var Icons = map[string]Icon{
 	IconLinesAdded:        {Glyph: "\uF457", Fallback: "+"},             // nf-oct-diff_added
 	IconLinesRemoved:      {Glyph: "\uF458", Fallback: "-"},             // nf-oct-diff_removed
 	IconEditPencil:        {Glyph: "\uF040", Fallback: "*"},             // nf-fa-pencil (same glyph as git_modified)
-	IconTokensCoin:        {Glyph: "\uEDE8", Fallback: "¤"},             // nf-fa-coins
+	IconTokensTicket:      {Glyph: "\uF145", Fallback: "tok:"},          // nf-fa-ticket
+	IconTokensInput:       {Glyph: "\U000F0120", Fallback: "in"},        // nf-md-tray_arrow_down
+	IconTokensOutput:      {Glyph: "\U000F011D", Fallback: "out"},       // nf-md-tray_arrow_up
+	IconTokensCacheCreate: {Glyph: "\U000F01BA", Fallback: "c+"},        // nf-md-database_plus
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,

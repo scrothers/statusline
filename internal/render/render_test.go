@@ -43,10 +43,8 @@ func fullPayload() *input.Payload {
 		},
 		Cost: &input.Cost{TotalCostUSD: 1.23, TotalDurationMS: 754_000, TotalLinesAdded: 342, TotalLinesRemoved: 58},
 		ContextWindow: &input.ContextWindow{
-			UsedPercentage:    new(float64(42)),
-			TotalInputTokens:  136_000,
-			TotalOutputTokens: 24_000,
-			CurrentUsage:      &input.Usage{InputTokens: 1000, CacheCreationInputTokens: 1000, CacheReadInputTokens: 8000},
+			UsedPercentage: new(float64(42)),
+			CurrentUsage:   &input.Usage{InputTokens: 1000, CacheCreationInputTokens: 1000, CacheReadInputTokens: 8000},
 		},
 		RateLimits: &input.RateLimits{
 			FiveHour: &input.RateLimitWindow{UsedPercentage: 30},
@@ -68,7 +66,7 @@ func TestRender_fullPayload(t *testing.T) {
 
 	for _, want := range []string{
 		"Opus", "high", "42%", "30%", "71%", "80%", "8.0k", // Claude line
-		"big-refactor", "statusline", "342", "58", "136.0k", "24.0k", "1.23", "12:34", // session line
+		"big-refactor", "statusline", "342", "58", "1.0k", "1.23", "12:34", // session line
 		"github.com", "scrothers", "128", "approved", "main", "my-feature", // git line
 	} {
 		if !strings.Contains(got, want) {

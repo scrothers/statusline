@@ -82,7 +82,12 @@ func fullScenario() Scenario {
 				ContextWindowSize: 200_000,
 				TotalInputTokens:  136_000,
 				TotalOutputTokens: 24_000,
-				CurrentUsage:      &input.Usage{InputTokens: 20_000, CacheCreationInputTokens: 8_000, CacheReadInputTokens: 108_000},
+				CurrentUsage: &input.Usage{
+					InputTokens:              20_000,
+					OutputTokens:             4_500,
+					CacheCreationInputTokens: 8_000,
+					CacheReadInputTokens:     108_000,
+				},
 			},
 			RateLimits: &input.RateLimits{
 				FiveHour: &input.RateLimitWindow{UsedPercentage: 42},
