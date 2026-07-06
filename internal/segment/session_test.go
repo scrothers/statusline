@@ -81,6 +81,42 @@ func TestLinesChangedSegment(t *testing.T) {
 		}
 	})
 
+	t.Run("pencil icon has two trailing spaces for breathing room", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalLinesAdded: 342, TotalLinesRemoved: 58}}, nil)
+		chunks, ok := (linesChangedSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) == 0 || !strings.HasSuffix(chunks[0].Text, "  ") {
+			t.Errorf("pencil chunk = %q, want it to end with two spaces", chunks[0].Text)
+		}
+	})
+
+	t.Run("diff icons carry semantic color, counts use secondary text color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalLinesAdded: 342, TotalLinesRemoved: 58}}, nil)
+		chunks, ok := (linesChangedSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if len(chunks) != 5 {
+			t.Fatalf("Render() produced %d chunks, want 5 (pencil, +icon, +count, -icon, -count)", len(chunks))
+		}
+		if chunks[1].FG != rc.Theme.Success {
+			t.Errorf("added icon FG = %+v, want theme.Success %+v", chunks[1].FG, rc.Theme.Success)
+		}
+		if chunks[2].FG != rc.Theme.TextSecondary {
+			t.Errorf("added count FG = %+v, want theme.TextSecondary %+v", chunks[2].FG, rc.Theme.TextSecondary)
+		}
+		if chunks[3].FG != rc.Theme.Danger {
+			t.Errorf("removed icon FG = %+v, want theme.Danger %+v", chunks[3].FG, rc.Theme.Danger)
+		}
+		if chunks[4].FG != rc.Theme.TextSecondary {
+			t.Errorf("removed count FG = %+v, want theme.TextSecondary %+v", chunks[4].FG, rc.Theme.TextSecondary)
+		}
+	})
+
 	t.Run("renders added only", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{Cost: &input.Cost{TotalLinesAdded: 10}}, nil)

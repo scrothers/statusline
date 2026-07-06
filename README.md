@@ -7,7 +7,7 @@ for anyone who wants to tweak it further.
 
 ```
 [38;2;254;128;25m󰚩[0m[38;2;213;196;161m Opus[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;146;131;116m    [0m[38;2;241;196;15m󰊚 high[0m[38;2;146;131;116m    [0m[38;2;250;147;48m󰍛[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;190;187;38m█[0m[38;2;197;187;39m█[0m[38;2;204;187;40m█[0m[38;2;211;187;41m█[0m[38;2;218;188;42m█[0m[38;2;225;188;43m█[0m[38;2;232;188;44m█[0m[38;2;239;188;45m█[0m[38;2;246;188;46m█[0m[38;2;250;182;47m█[0m[38;2;250;170;47m█[0m[38;2;250;158;48m█[0m[38;2;250;146;48m▋[0m[38;2;80;73;69m░░░░░░[0m[38;2;146;131;116m⟩ [0m[38;2;250;147;48m68%[0m[38;2;146;131;116m 136.0k/64.0k[0m[38;2;146;131;116m    [0m[38;2;239;188;45m 5h[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;210;187;41m█[0m[38;2;236;188;45m▌[0m[38;2;80;73;69m░░░[0m[38;2;146;131;116m⟩[0m[38;2;239;188;45m 42%[0m[38;2;146;131;116m    [0m[38;2;250;140;49m󰨳 7d[0m[38;2;146;131;116m ⟨[0m[38;2;184;187;38m█[0m[38;2;210;187;41m█[0m[38;2;236;188;45m█[0m[38;2;250;165;48m█[0m[38;2;250;119;50m▎[0m[38;2;80;73;69m░[0m[38;2;146;131;116m⟩[0m[38;2;250;140;49m 71%[0m[38;2;146;131;116m    [0m[38;2;142;192;124m 79% (108.0k)[0m
-[38;2;254;128;25m[0m[38;2;213;196;161m big-refactor[0m[38;2;146;131;116m    [0m[38;2;254;128;25m󰉋[0m[38;2;213;196;161m /home/user/code/statusline[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;184;187;38m  342[0m[38;2;251;73;52m  58[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;142;192;124m 󰄠 20.0k[0m[38;2;142;192;124m 󰄝 4.5k[0m[38;2;142;192;124m 󰆺 8.0k[0m[38;2;142;192;124m  108.0k[0m[38;2;146;131;116m    [0m[38;2;142;192;124m2.17[0m[38;2;146;131;116m    [0m[38;2;142;192;124m 1:23:45[0m
+[38;2;254;128;25m[0m[38;2;213;196;161m big-refactor[0m[38;2;146;131;116m    [0m[38;2;254;128;25m󰉋[0m[38;2;213;196;161m /home/user/code/statusline[0m[38;2;146;131;116m    [0m[38;2;250;189;47m  [0m[38;2;184;187;38m[0m[38;2;213;196;161m 342[0m[38;2;251;73;52m [0m[38;2;213;196;161m 58[0m[38;2;146;131;116m    [0m[38;2;250;189;47m  [0m[38;2;184;187;38m󰄠[0m[38;2;213;196;161m 20.0k[0m[38;2;251;73;52m 󰄝[0m[38;2;213;196;161m 4.5k[0m[38;2;142;192;124m 󰆺[0m[38;2;213;196;161m 8.0k[0m[38;2;142;192;124m [0m[38;2;213;196;161m 108.0k[0m[38;2;146;131;116m    [0m[38;2;142;192;124m2.17[0m[38;2;146;131;116m    [0m[38;2;142;192;124m 1:23:45[0m
 [38;2;254;128;25m[0m[38;2;146;131;116m github.com[0m[38;2;213;196;161m/scrothers[0m[38;2;235;219;178m/statusline[0m[38;2;146;131;116m    [0m[38;2;184;187;38m #128[0m[38;2;184;187;38m approved[0m[38;2;146;131;116m    [0m[38;2;250;189;47m[0m[38;2;235;219;178m main[0m[38;2;184;187;38m 󰔡 2[0m[38;2;250;189;47m  1[0m[38;2;146;131;116m  3[0m[38;2;184;187;38m ↑ 1[0m[38;2;146;131;116m    [0m[38;2;142;192;124m󰤨 my-feature[0m
 ```
 
@@ -107,15 +107,19 @@ and percentage text use a separate smooth gradient based on its own overall
 percentage.) The context bar also shows a `used/remaining` token count next
 to the percentage whenever the context window size is known.
 
-`lines_changed` leads with a pencil icon, then diff-added/diff-removed icons
-that alone carry the +/- meaning — the numbers themselves have no ASCII
-sign. `token_counts` leads with a ticket icon and breaks down the most
+`lines_changed` leads with a pencil icon (given two trailing spaces of its
+own, since its glyph reads tight against a following icon), then
+diff-added/diff-removed icons that alone carry the +/- meaning. `token_counts`
+leads with a ticket icon (same two-space treatment) and breaks down the most
 recent API response's usage into four counts, each behind its own icon: an
 inbound tray for input tokens, an outbound tray for output tokens, a
 database-plus for cache-creation tokens, and the same cache icon used
 elsewhere for cache-read tokens. All four come from that one response, so
 they share a single time scope rather than mixing session totals with a
-per-response cache breakdown.
+per-response cache breakdown. In both segments, only the icons carry
+semantic color (green/red for add-remove and input-output, info for the
+cache pair); the counts themselves are always the theme's secondary text
+color, with no ASCII sign.
 
 ## Themes
 

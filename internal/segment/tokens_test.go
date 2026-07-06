@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/scrothers/statusline/internal/input"
+	"github.com/scrothers/statusline/internal/style"
 )
 
 func TestTokenCountsSegment(t *testing.T) {
@@ -76,7 +77,7 @@ func TestTokenCountsSegment(t *testing.T) {
 		}
 	})
 
-	t.Run("token value chunks use info color", func(t *testing.T) {
+	t.Run("ticket icon has two trailing spaces for breathing room", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{
 			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{InputTokens: 500}},
@@ -85,11 +86,47 @@ func TestTokenCountsSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		if len(chunks) < 2 {
-			t.Fatal("Render() produced fewer than 2 chunks")
+		if len(chunks) == 0 || !strings.HasSuffix(chunks[0].Text, "  ") {
+			t.Errorf("ticket chunk = %q, want it to end with two spaces", chunks[0].Text)
 		}
-		if chunks[1].FG != rc.Theme.Info {
-			t.Errorf("FG = %+v, want theme.Info %+v", chunks[1].FG, rc.Theme.Info)
+	})
+
+	t.Run("each category icon carries its own color, counts use secondary text color", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{
+			ContextWindow: &input.ContextWindow{CurrentUsage: &input.Usage{
+				InputTokens:              20_000,
+				OutputTokens:             8_200,
+				CacheCreationInputTokens: 4_000,
+				CacheReadInputTokens:     108_000,
+			}},
+		}, nil)
+		chunks, ok := (tokenCountsSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		// ticket, [in-icon, in-count], [out-icon, out-count], [cc-icon, cc-count], [cr-icon, cr-count]
+		if len(chunks) != 9 {
+			t.Fatalf("Render() produced %d chunks, want 9", len(chunks))
+		}
+		wantColors := []struct {
+			idx  int
+			name string
+			want style.Color
+		}{
+			{1, "input icon", rc.Theme.Success},
+			{2, "input count", rc.Theme.TextSecondary},
+			{3, "output icon", rc.Theme.Danger},
+			{4, "output count", rc.Theme.TextSecondary},
+			{5, "cache-creation icon", rc.Theme.Info},
+			{6, "cache-creation count", rc.Theme.TextSecondary},
+			{7, "cache-read icon", rc.Theme.Info},
+			{8, "cache-read count", rc.Theme.TextSecondary},
+		}
+		for _, wc := range wantColors {
+			if chunks[wc.idx].FG != wc.want {
+				t.Errorf("%s FG = %+v, want %+v", wc.name, chunks[wc.idx].FG, wc.want)
+			}
 		}
 	})
 
@@ -106,8 +143,8 @@ func TestTokenCountsSegment(t *testing.T) {
 		if !strings.Contains(text, "250") {
 			t.Errorf("rendered text = %q, want it to contain 250", text)
 		}
-		if len(chunks) != 2 {
-			t.Errorf("Render() produced %d chunks, want 2 (ticket + cache-read only)", len(chunks))
+		if len(chunks) != 3 {
+			t.Errorf("Render() produced %d chunks, want 3 (ticket + cache-read icon + cache-read count)", len(chunks))
 		}
 	})
 }

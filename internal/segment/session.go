@@ -28,9 +28,10 @@ func (sessionNameSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 // linesChangedSegment renders the session's total added/removed line
 // counts, prefixed with a pencil to mark it as an edit tally. The
-// diff-added/diff-removed icons alone carry the +/- meaning, so the counts
-// themselves are plain numbers with no ASCII sign. Omitted when there's no
-// cost data yet, or nothing has changed.
+// diff-added/diff-removed icons carry the +/- meaning and their semantic
+// color; the counts themselves are plain numbers in the theme's secondary
+// text color, with no ASCII sign. Omitted when there's no cost data yet, or
+// nothing has changed.
 type linesChangedSegment struct{}
 
 func (linesChangedSegment) ID() string { return "lines_changed" }
@@ -45,21 +46,26 @@ func (linesChangedSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	nerd := rc.Config.NerdFontEnabled()
 	chunks := []style.Chunk{
-		{Text: theme.Glyph(theme.IconEditPencil, nerd), FG: rc.Theme.Warning},
+		{Text: theme.Glyph(theme.IconEditPencil, nerd) + "  ", FG: rc.Theme.Warning},
 	}
+	first := true
 	if cost.TotalLinesAdded > 0 {
 		icon := theme.Glyph(theme.IconLinesAdded, nerd)
-		chunks = append(chunks, style.Chunk{
-			Text: " " + icon + " " + strconv.Itoa(cost.TotalLinesAdded),
-			FG:   rc.Theme.Success,
-		})
+		chunks = append(chunks,
+			style.Chunk{Text: icon, FG: rc.Theme.Success},
+			style.Chunk{Text: " " + strconv.Itoa(cost.TotalLinesAdded), FG: rc.Theme.TextSecondary},
+		)
+		first = false
 	}
 	if cost.TotalLinesRemoved > 0 {
 		icon := theme.Glyph(theme.IconLinesRemoved, nerd)
-		chunks = append(chunks, style.Chunk{
-			Text: " " + icon + " " + strconv.Itoa(cost.TotalLinesRemoved),
-			FG:   rc.Theme.Danger,
-		})
+		if !first {
+			icon = " " + icon
+		}
+		chunks = append(chunks,
+			style.Chunk{Text: icon, FG: rc.Theme.Danger},
+			style.Chunk{Text: " " + strconv.Itoa(cost.TotalLinesRemoved), FG: rc.Theme.TextSecondary},
+		)
 	}
 	return chunks, true
 }
