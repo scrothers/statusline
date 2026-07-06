@@ -1,6 +1,8 @@
 package segment
 
 import (
+	"strings"
+
 	"github.com/scrothers/statusline/internal/style"
 	"github.com/scrothers/statusline/internal/theme"
 )
@@ -21,11 +23,29 @@ func (repoSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 	r := rc.Payload.Workspace.Repo
 
-	icon := theme.Glyph(theme.IconRepo, rc.Config.NerdFontEnabled())
+	icon := theme.Glyph(repoHostIconKey(r.Host), rc.Config.NerdFontEnabled())
 	return []style.Chunk{
 		{Text: icon, FG: rc.Theme.IdentityAccent},
 		{Text: " " + r.Host, FG: rc.Theme.Muted},
 		{Text: "/" + r.Owner, FG: rc.Theme.TextSecondary},
 		{Text: "/" + r.Name, FG: rc.Theme.IdentityText},
 	}, true
+}
+
+// repoHostIconKey picks a host-branded icon by matching known git forges as
+// a substring of the host (covers both public instances like "github.com"
+// and enterprise/self-hosted ones like "github.company.com"), falling back
+// to a generic git icon for anything else (e.g. a bare "git.company.com").
+func repoHostIconKey(host string) string {
+	h := strings.ToLower(host)
+	switch {
+	case strings.Contains(h, "gitlab"):
+		return theme.IconRepoGitLab
+	case strings.Contains(h, "github"):
+		return theme.IconRepoGitHub
+	case strings.Contains(h, "forgejo"):
+		return theme.IconRepoForgejo
+	default:
+		return theme.IconRepoGit
+	}
 }

@@ -29,7 +29,10 @@ const (
 	IconThinkingOff       = "thinking_off"
 	IconCache             = "cache"
 	IconSessionName       = "session_name"
-	IconRepo              = "repo"
+	IconRepoGitHub        = "repo_github"
+	IconRepoGitLab        = "repo_gitlab"
+	IconRepoForgejo       = "repo_forgejo"
+	IconRepoGit           = "repo_git"
 	IconWorktree          = "worktree"
 	IconEffortLow         = "effort_low"
 	IconEffortMedium      = "effort_medium"
@@ -88,7 +91,10 @@ var Icons = map[string]Icon{
 	IconThinkingOff:       {Glyph: "\uF0EB", Fallback: "idle"},          // nf-fa-lightbulb
 	IconCache:             {Glyph: "\uF49B", Fallback: "cache"},         // nf-oct-cache
 	IconSessionName:       {Glyph: "\uF02B", Fallback: "session:"},      // nf-fa-tag
-	IconRepo:              {Glyph: "\uF401", Fallback: "repo:"},         // nf-oct-repo
+	IconRepoGitHub:        {Glyph: "\uF09B", Fallback: "GH:"},           // nf-fa-github
+	IconRepoGitLab:        {Glyph: "\uE7EB", Fallback: "GL:"},           // nf-dev-gitlab
+	IconRepoForgejo:       {Glyph: "\uF335", Fallback: "FJ:"},           // nf-linux-forgejo
+	IconRepoGit:           {Glyph: "\uE702", Fallback: "repo:"},         // nf-dev-git
 	IconWorktree:          {Glyph: "\U000F0928", Fallback: "worktree:"}, // nf-md-source_branch (approx)
 	IconEffortLow:         {Glyph: "\U000F0873", Fallback: "low"},       // nf-md-gauge_empty
 	IconEffortMedium:      {Glyph: "\U000F0875", Fallback: "medium"},    // nf-md-gauge_low

@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/scrothers/statusline/internal/input"
+	"github.com/scrothers/statusline/internal/theme"
 )
 
 func TestRepoSegment(t *testing.T) {
@@ -62,4 +63,30 @@ func TestRepoSegment(t *testing.T) {
 			t.Errorf("repo name FG = %+v, want theme.IdentityText %+v", last.FG, rc.Theme.IdentityText)
 		}
 	})
+}
+
+func TestRepoHostIconKey(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		host string
+		want string
+	}{
+		{host: "github.com", want: theme.IconRepoGitHub},
+		{host: "github.enterprise.example.com", want: theme.IconRepoGitHub},
+		{host: "gitlab.com", want: theme.IconRepoGitLab},
+		{host: "gitlab.example.com", want: theme.IconRepoGitLab},
+		{host: "codeberg.org", want: theme.IconRepoGit}, // forgejo-based but host doesn't say so
+		{host: "forgejo.example.com", want: theme.IconRepoForgejo},
+		{host: "git.example.com", want: theme.IconRepoGit},
+		{host: "", want: theme.IconRepoGit},
+	}
+	for _, tt := range tests {
+		t.Run(tt.host, func(t *testing.T) {
+			t.Parallel()
+			if got := repoHostIconKey(tt.host); got != tt.want {
+				t.Errorf("repoHostIconKey(%q) = %q, want %q", tt.host, got, tt.want)
+			}
+		})
+	}
 }
