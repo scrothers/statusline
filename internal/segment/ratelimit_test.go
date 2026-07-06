@@ -141,7 +141,7 @@ func TestRateLimitSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		// chunks[0] = icon+label, chunks[1] = " ⟨", chunks[2:2+width] = bar cells.
+		// chunks[0] = icon+label, chunks[1] = separator space, chunks[2:2+width] = bar cells.
 		const barStart = 2
 		for i := range rateLimitGaugeWidth {
 			want := positionGradientColor(&th, i, rateLimitGaugeWidth)

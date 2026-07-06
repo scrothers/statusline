@@ -25,10 +25,10 @@ const (
 
 // rateLimitSegment renders one Claude subscription rate-limit gauge, styled
 // to match the context-window gauge: an icon, an explicit window label
-// ("5h"/"7d") so the two gauges aren't distinguishable by icon alone, a
-// bracketed bar whose filled cells follow the same fixed green-to-red
-// position gradient, the percentage, and (when the payload reports a reset
-// time) a human-friendly countdown to when the window resets. FiveHour and
+// ("5h"/"7d") so the two gauges aren't distinguishable by icon alone, a bar
+// whose filled cells follow the same fixed green-to-red position gradient,
+// the percentage, and (when the payload reports a reset time) a
+// human-friendly countdown to when the window resets. FiveHour and
 // SevenDay are registered as separate Segment instances (ratelimit_5h /
 // ratelimit_7d) since either window may be independently absent from the
 // payload.
@@ -73,15 +73,14 @@ func (s rateLimitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	filled, track := style.BlockBarParts(win.UsedPercentage, rateLimitGaugeWidth)
 	icon := theme.Glyph(iconKey, rc.Config.NerdFontEnabled())
 
-	chunks := make([]style.Chunk, 0, rateLimitGaugeWidth+6)
+	chunks := make([]style.Chunk, 0, rateLimitGaugeWidth+5)
 	chunks = append(chunks,
 		style.Chunk{Text: icon + " " + label, FG: color},
-		style.Chunk{Text: " ⟨", FG: rc.Theme.Muted},
+		style.Chunk{Text: " ", FG: rc.Theme.Muted},
 	)
 	chunks = append(chunks, gradientBarCellChunks(rc.Theme, filled, rateLimitGaugeWidth)...)
 	chunks = append(chunks,
 		style.Chunk{Text: track, FG: rc.Theme.TrackDim},
-		style.Chunk{Text: "⟩", FG: rc.Theme.Muted},
 		style.Chunk{Text: fmt.Sprintf(" %.0f%%", win.UsedPercentage), FG: color},
 	)
 	if win.ResetsAt > 0 {

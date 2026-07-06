@@ -85,8 +85,8 @@ func TestContextWindowSegment_barCellsStayFixedAsFillGrows(t *testing.T) {
 		t.Fatal("Render() ok = false, want true")
 	}
 
-	// Both renders start with the same icon + " ⟨" chunks (indices 0-1)
-	// before the per-cell bar chunks begin at index 2.
+	// Both renders start with the same icon + separator-space chunks
+	// (indices 0-1) before the per-cell bar chunks begin at index 2.
 	const barStart = 2
 	filledAtLow, _ := style.BlockBarParts(20, 10)
 	lowFilledCount := len([]rune(filledAtLow))

@@ -48,7 +48,7 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	if rc.Payload.Exceeds200k || pct >= contextAlertThreshold {
 		icon := theme.Glyph(theme.IconContextAlert, nerd)
-		text := icon + " ⟨" + filled + track + "⟩ " + pctText + countsText
+		text := icon + " " + filled + track + " " + pctText + countsText
 		return []style.Chunk{{Text: text, FG: rc.Theme.Danger, Bold: true}}, true
 	}
 
@@ -56,12 +56,12 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	icon := theme.Glyph(theme.IconContextWindow, nerd)
 	chunks := []style.Chunk{
 		{Text: icon, FG: color},
-		{Text: " ⟨", FG: rc.Theme.Muted},
+		{Text: " ", FG: rc.Theme.Muted},
 	}
 	chunks = append(chunks, gradientBarCellChunks(rc.Theme, filled, width)...)
 	chunks = append(chunks,
 		style.Chunk{Text: track, FG: rc.Theme.TrackDim},
-		style.Chunk{Text: "⟩ ", FG: rc.Theme.Muted},
+		style.Chunk{Text: " ", FG: rc.Theme.Muted},
 		style.Chunk{Text: pctText, FG: color},
 	)
 	if countsText != "" {
