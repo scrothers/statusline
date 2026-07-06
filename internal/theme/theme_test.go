@@ -1,6 +1,7 @@
 package theme
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/scrothers/statusline/internal/style"
@@ -31,6 +32,63 @@ func TestLoadRegistry(t *testing.T) {
 			t.Errorf("registry[%q] has an unparsed semantic color: %+v", name, th)
 		}
 	}
+}
+
+func TestRawThemeResolve(t *testing.T) {
+	t.Parallel()
+
+	validColors := func() (c struct {
+		IdentityAccent string `toml:"identity_accent"`
+		IdentityText   string `toml:"identity_text"`
+		TextPrimary    string `toml:"text_primary"`
+		TextSecondary  string `toml:"text_secondary"`
+		Success        string `toml:"success"`
+		Warning        string `toml:"warning"`
+		Danger         string `toml:"danger"`
+		Info           string `toml:"info"`
+		Muted          string `toml:"muted"`
+		TrackDim       string `toml:"track_dim"`
+	}) {
+		hex := "#112233"
+		c.IdentityAccent, c.IdentityText = hex, hex
+		c.TextPrimary, c.TextSecondary = hex, hex
+		c.Success, c.Warning, c.Danger = hex, hex, hex
+		c.Info, c.Muted, c.TrackDim = hex, hex, hex
+		return c
+	}
+
+	t.Run("all valid hex colors resolves cleanly", func(t *testing.T) {
+		t.Parallel()
+		raw := rawTheme{Name: "test-theme"}
+		raw.Colors = validColors()
+
+		th, err := raw.resolve()
+		if err != nil {
+			t.Fatalf("resolve() error = %v", err)
+		}
+		if th.Name != "test-theme" {
+			t.Errorf("Name = %q, want test-theme", th.Name)
+		}
+		if !th.Success.Valid {
+			t.Error("Success.Valid = false, want true")
+		}
+	})
+
+	t.Run("invalid hex colors join into one error", func(t *testing.T) {
+		t.Parallel()
+		raw := rawTheme{Name: "broken-theme"}
+		raw.Colors = validColors()
+		raw.Colors.Success = "not-hex"
+		raw.Colors.Danger = "also-not-hex"
+
+		_, err := raw.resolve()
+		if err == nil {
+			t.Fatal("resolve() error = nil, want an error for invalid hex colors")
+		}
+		if !strings.Contains(err.Error(), "broken-theme") {
+			t.Errorf("resolve() error = %q, want it to name the theme", err.Error())
+		}
+	})
 }
 
 func TestNames(t *testing.T) {

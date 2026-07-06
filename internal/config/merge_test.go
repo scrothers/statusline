@@ -63,4 +63,55 @@ func TestMergeInto(t *testing.T) {
 			t.Errorf("mergeInto with zero-value overlay changed base: got %+v, want %+v", base, want)
 		}
 	})
+
+	t.Run("segments map starts nil, an overlay entry initializes it", func(t *testing.T) {
+		t.Parallel()
+		base := Config{}
+		overlay := Config{Segments: map[string]SegmentConfig{"pr": {Icon: "new-icon"}}}
+		mergeInto(&base, overlay)
+
+		if base.Segments == nil {
+			t.Fatal("Segments = nil, want initialized")
+		}
+		if base.Segments["pr"].Icon != "new-icon" {
+			t.Errorf("Icon = %q, want new-icon", base.Segments["pr"].Icon)
+		}
+	})
+
+	t.Run("scalar overrides all apply", func(t *testing.T) {
+		t.Parallel()
+		nerdFontOff := false
+		gitEnabledOff := false
+		base := Default()
+		overlay := Config{
+			Theme:    "nord",
+			NerdFont: &nerdFontOff,
+			Git: GitConfig{
+				Enabled:    &gitEnabledOff,
+				TimeoutMS:  999,
+				CacheTTLMS: 888,
+			},
+			Budget: BudgetConfig{TotalTimeoutMS: 777},
+		}
+		mergeInto(&base, overlay)
+
+		if base.Theme != "nord" {
+			t.Errorf("Theme = %q, want nord", base.Theme)
+		}
+		if base.NerdFontEnabled() {
+			t.Error("NerdFontEnabled() = true, want false (overridden)")
+		}
+		if base.Git.IsEnabled() {
+			t.Error("Git.IsEnabled() = true, want false (overridden)")
+		}
+		if base.Git.TimeoutMS != 999 {
+			t.Errorf("Git.TimeoutMS = %d, want 999", base.Git.TimeoutMS)
+		}
+		if base.Git.CacheTTLMS != 888 {
+			t.Errorf("Git.CacheTTLMS = %d, want 888", base.Git.CacheTTLMS)
+		}
+		if base.Budget.TotalTimeoutMS != 777 {
+			t.Errorf("Budget.TotalTimeoutMS = %d, want 777", base.Budget.TotalTimeoutMS)
+		}
+	})
 }

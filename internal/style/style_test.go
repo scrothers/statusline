@@ -18,6 +18,7 @@ func TestParseHex(t *testing.T) {
 		{name: "valid black", in: "#000000", want: RGB(0, 0, 0)},
 		{name: "missing hash", in: "ff8019", wantErr: true},
 		{name: "wrong length", in: "#fff", wantErr: true},
+		{name: "right length, invalid hex digits", in: "#gggggg", wantErr: true},
 	}
 
 	for _, tt := range tests {
@@ -112,6 +113,26 @@ func TestStrip(t *testing.T) {
 			name: "plain text passes through unchanged",
 			in:   "just text",
 			want: "just text",
+		},
+		{
+			name: "OSC terminated with ST (ESC backslash) instead of BEL",
+			in:   "\x1b]8;;https://example.com\x1b\\repo\x1b]8;;\x1b\\",
+			want: "repo",
+		},
+		{
+			name: "OSC with no terminator at all consumes to the end",
+			in:   "before\x1b]8;;https://example.com/unterminated",
+			want: "before",
+		},
+		{
+			name: "trailing lone ESC with nothing after it",
+			in:   "text\x1b",
+			want: "text\x1b",
+		},
+		{
+			name: "ESC followed by an unrecognized byte is kept literally",
+			in:   "a\x1bXb",
+			want: "a\x1bXb",
 		},
 	}
 

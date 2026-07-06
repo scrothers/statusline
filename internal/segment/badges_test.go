@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/scrothers/statusline/internal/input"
+	"github.com/scrothers/statusline/internal/style"
 )
 
 func TestPRSegment(t *testing.T) {
@@ -77,6 +78,20 @@ func TestPRSegment(t *testing.T) {
 			t.Errorf("word FG = %+v, want theme.Success %+v", chunks[2].FG, rc.Theme.Success)
 		}
 	})
+
+	t.Run("a URL wraps the number in a hyperlink", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{
+			PR: &input.PR{Number: 42, URL: "https://github.com/scrothers/statusline/pull/42"},
+		}, nil)
+		chunks, ok := (prSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if !strings.Contains(chunkText(chunks), "https://github.com/scrothers/statusline/pull/42") {
+			t.Errorf("rendered text = %q, want it to contain the PR URL in a hyperlink", chunkText(chunks))
+		}
+	})
 }
 
 func TestVimSegment(t *testing.T) {
@@ -104,6 +119,29 @@ func TestVimSegment(t *testing.T) {
 			t.Errorf("BG = %+v, want the terminal default (no pill)", chunks[0].BG)
 		}
 	})
+
+	modeTests := []struct {
+		mode        string
+		wantColorOf func(rc *RenderContext) style.Color
+	}{
+		{mode: "INSERT", wantColorOf: func(rc *RenderContext) style.Color { return rc.Theme.Success }},
+		{mode: "VISUAL", wantColorOf: func(rc *RenderContext) style.Color { return rc.Theme.Warning }},
+		{mode: "VISUAL LINE", wantColorOf: func(rc *RenderContext) style.Color { return rc.Theme.Warning }},
+		{mode: "NORMAL", wantColorOf: func(rc *RenderContext) style.Color { return rc.Theme.Info }},
+	}
+	for _, tt := range modeTests {
+		t.Run("mode "+tt.mode, func(t *testing.T) {
+			t.Parallel()
+			rc := newTestContext(t, &input.Payload{Vim: &input.Vim{Mode: tt.mode}}, nil)
+			chunks, ok := (vimSegment{}).Render(rc)
+			if !ok {
+				t.Fatal("Render() ok = false, want true")
+			}
+			if chunks[0].FG != tt.wantColorOf(rc) {
+				t.Errorf("FG = %+v, want %+v", chunks[0].FG, tt.wantColorOf(rc))
+			}
+		})
+	}
 }
 
 func TestAgentSegment(t *testing.T) {

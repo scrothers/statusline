@@ -37,6 +37,20 @@ func TestBreadcrumb(t *testing.T) {
 			maxLen: 5,
 			want:   "a-single-extremely-long-path-segment-that-cannot-shrink-at-all",
 		},
+		{
+			name:   "no separators skips straight to the last-segment fallback",
+			path:   "justonesegmentwithnoslashesatall",
+			home:   "",
+			maxLen: 5,
+			want:   "justonesegmentwithnoslashesatall",
+		},
+		{
+			name:   "empty middle segment from a double slash is skipped, not shrunk",
+			path:   "/home//verylongmiddlesegmentnamehere/end",
+			home:   "",
+			maxLen: 10,
+			want:   "/h//v/end",
+		},
 	}
 
 	for _, tt := range tests {

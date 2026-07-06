@@ -70,3 +70,50 @@ func TestRegistry(t *testing.T) {
 		}
 	}
 }
+
+// TestSegmentPriorities pins every segment's declared drop priority. This is
+// a real regression test, not just a coverage exercise: fitToWidth's
+// truncation order depends entirely on these values, so an accidental
+// change here would silently reorder which segments survive a narrow
+// terminal.
+func TestSegmentPriorities(t *testing.T) {
+	t.Parallel()
+
+	want := map[string]int{
+		"model":          100,
+		"directory":      100,
+		"git":            90,
+		"context_window": 90,
+		"repo":           85,
+		"cost":           70,
+		"duration":       65,
+		"pr":             60,
+		"lines_changed":  55,
+		"ratelimit_5h":   50,
+		"ratelimit_7d":   50,
+		"token_counts":   50,
+		"session_name":   45,
+		"effort":         40,
+		"cache":          35,
+		"vim":            30,
+		"agent":          30,
+		"thinking":       25,
+		"worktree":       25,
+		"output_style":   20,
+	}
+
+	reg := Registry()
+	if len(want) != len(reg) {
+		t.Fatalf("test table has %d entries, Registry() has %d; keep them in sync", len(want), len(reg))
+	}
+	for id, wantPriority := range want {
+		seg, ok := reg[id]
+		if !ok {
+			t.Errorf("Registry() missing segment %q", id)
+			continue
+		}
+		if got := seg.Priority(); got != wantPriority {
+			t.Errorf("Registry()[%q].Priority() = %d, want %d", id, got, wantPriority)
+		}
+	}
+}

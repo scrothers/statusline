@@ -66,6 +66,27 @@ func TestParsePorcelainV2(t *testing.T) {
 			in:   "",
 			want: Status{},
 		},
+		{
+			name: "malformed change-type line is skipped, not fatal",
+			in: "# branch.head main\n" +
+				"1 M\n" + // too few fields
+				"1 MMM N... 100644 100644 100644 hash1 hash2 badxy.go\n" + // XY not 2 chars
+				"1 M. N... 100644 100644 100644 hash1 hash2 staged.go\n", // valid, still counted
+			want: Status{Branch: "main", Staged: 1},
+		},
+		{
+			name: "malformed branch header lines are ignored",
+			in: "# branch.oid\n" + // too few fields
+				"# branch.head main\n" +
+				"# branch.ab +2\n", // too few fields, ahead/behind stay 0
+			want: Status{Branch: "main"},
+		},
+		{
+			name: "non-numeric branch.ab counts default to zero",
+			in: "# branch.head main\n" +
+				"# branch.ab +abc -xyz\n",
+			want: Status{Branch: "main"},
+		},
 	}
 
 	for _, tt := range tests {
@@ -79,6 +100,19 @@ func TestParsePorcelainV2(t *testing.T) {
 				t.Errorf("ParsePorcelainV2() = %+v, want %+v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestParsePorcelainV2_lineTooLongErrors(t *testing.T) {
+	t.Parallel()
+
+	// A single line with no newline, longer than bufio.Scanner's default
+	// token buffer, forces bufio.ErrTooLong — the one error path
+	// ParsePorcelainV2 can actually hit from an in-memory byte slice.
+	huge := "? " + strings.Repeat("a", 128*1024)
+
+	if _, err := ParsePorcelainV2([]byte(huge)); err == nil {
+		t.Error("ParsePorcelainV2() error = nil, want an error for an oversized line")
 	}
 }
 

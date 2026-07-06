@@ -86,6 +86,33 @@ enabled = false
 	}
 }
 
+func TestLoad_explicitPathUnreadableWarnsAndFallsBack(t *testing.T) {
+	if os.Geteuid() == 0 {
+		t.Skip("root ignores file permission bits, so this can't force a read failure")
+	}
+	isolateHome(t)
+
+	dir := t.TempDir()
+	path := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(path, []byte(`theme = "nord"`), 0o644); err != nil {
+		t.Fatalf("WriteFile() error = %v", err)
+	}
+	// os.Stat (which Load uses to check existence) doesn't require read
+	// permission on the file itself, only search permission on its parent
+	// directories, so this reaches os.ReadFile's own error branch.
+	if err := os.Chmod(path, 0o000); err != nil {
+		t.Fatalf("Chmod() error = %v", err)
+	}
+
+	cfg, warnings := Load(path)
+	if len(warnings) != 1 {
+		t.Fatalf("Load() warnings = %v, want exactly 1", warnings)
+	}
+	if cfg.Theme != "gruvbox" {
+		t.Errorf("Theme = %q, want gruvbox (default)", cfg.Theme)
+	}
+}
+
 func TestLoad_malformedConfigWarnsAndFallsBack(t *testing.T) {
 	isolateHome(t)
 

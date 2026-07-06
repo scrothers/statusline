@@ -124,4 +124,16 @@ func TestGitSegment(t *testing.T) {
 			t.Errorf("rendered text = %q, oid should be truncated to 7 chars", text)
 		}
 	})
+
+	t.Run("detached head with no oid falls back to HEAD", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{}, &gitstatus.Status{Detached: true})
+		chunks, ok := (gitSegment{}).Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if !strings.Contains(chunkText(chunks), "HEAD") {
+			t.Errorf("rendered text = %q, want it to contain HEAD", chunkText(chunks))
+		}
+	})
 }

@@ -23,12 +23,10 @@ const dividerText = "  " + dividerGlyph + "  "
 // dividerColor) between adjacent segments. The background is always
 // style.Default regardless of what a chunk's BG field holds — no segment
 // may paint a background, and this is where that's enforced centrally
-// rather than trusted to every segment individually.
+// rather than trusted to every segment individually. renderLine only calls
+// this with a non-empty slice, having already handled the empty case
+// itself.
 func joinLine(segments []lineSegment, dividerColor style.Color) string {
-	if len(segments) == 0 {
-		return ""
-	}
-
 	var b strings.Builder
 	for i, seg := range segments {
 		if i > 0 {
