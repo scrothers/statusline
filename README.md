@@ -95,11 +95,15 @@ purple scale independent of the active theme, so "getting hotter" reads the
 same everywhere.
 
 `context_window`'s bar width scales with the detected terminal width
-(clamped between 8 and 24 cells) instead of a fixed size, and its fill color
-is a smooth gradient sliding continuously from the theme's success color
-through warning to danger — not the three flat threshold bands the
-rate-limit gauges still use. It also shows a `used/remaining` token count
-next to the percentage whenever the context window size is known.
+(clamped between 8 and 24 cells) instead of a fixed size. Each cell's color
+is fixed by its position along the bar — green on the left sliding through
+warning to danger on the right — so filling the bar reveals more of a
+stable on-screen gradient from the left rather than shifting every already-
+filled cell's color together each time the percentage changes. (The icon
+and percentage text use a separate smooth gradient based on the overall
+percentage.) Rate-limit gauges still use flat threshold-band coloring. The
+context bar also shows a `used/remaining` token count next to the
+percentage whenever the context window size is known.
 
 ## Themes
 

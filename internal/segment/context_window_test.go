@@ -100,6 +100,98 @@ func TestContextGradientColor(t *testing.T) {
 	})
 }
 
+func TestPositionGradientColor(t *testing.T) {
+	t.Parallel()
+	th := testTheme(t)
+
+	tests := []struct {
+		name  string
+		index int
+		width int
+		want  style.Color
+	}{
+		{name: "leftmost cell is pure success", index: 0, width: 10, want: th.Success},
+		{name: "rightmost cell is pure danger", index: 9, width: 10, want: th.Danger},
+		{name: "midpoint cell is pure warning", index: 5, width: 11, want: th.Warning},
+		{name: "single-cell bar is success", index: 0, width: 1, want: th.Success},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := positionGradientColor(&th, tt.index, tt.width); got != tt.want {
+				t.Errorf("positionGradientColor(%d, %d) = %+v, want %+v", tt.index, tt.width, got, tt.want)
+			}
+		})
+	}
+
+}
+
+func TestContextBarCellChunks(t *testing.T) {
+	t.Parallel()
+	th := testTheme(t)
+
+	t.Run("one chunk per filled cell, colored by position", func(t *testing.T) {
+		t.Parallel()
+		filled, _ := style.BlockBarParts(80, 10) // 8 full cells at 80% of width 10
+		chunks := contextBarCellChunks(&th, filled, 10)
+
+		wantLen := len([]rune(filled))
+		if len(chunks) != wantLen {
+			t.Fatalf("len(chunks) = %d, want %d (one per filled rune)", len(chunks), wantLen)
+		}
+		for i, c := range chunks {
+			want := positionGradientColor(&th, i, 10)
+			if c.FG != want {
+				t.Errorf("chunks[%d].FG = %+v, want %+v", i, c.FG, want)
+			}
+		}
+	})
+
+	t.Run("empty filled string produces no chunks", func(t *testing.T) {
+		t.Parallel()
+		if chunks := contextBarCellChunks(&th, "", 10); len(chunks) != 0 {
+			t.Errorf("contextBarCellChunks(\"\", 10) = %v, want empty", chunks)
+		}
+	})
+}
+
+// TestContextWindowSegment_barCellsStayFixedAsFillGrows is the end-to-end
+// guarantee behind this feature: rendering the same segment at a higher
+// percentage must not repaint the colors of cells that were already filled
+// at the lower percentage — only new cells are revealed to the right, each
+// with its own fixed position color.
+func TestContextWindowSegment_barCellsStayFixedAsFillGrows(t *testing.T) {
+	t.Parallel()
+
+	low := newTestContext(t, &input.Payload{ContextWindow: &input.ContextWindow{UsedPercentage: new(float64(20))}}, nil)
+	low.Columns = 100 // -> gauge width 10, fixed and identical for both renders
+	high := newTestContext(t, &input.Payload{ContextWindow: &input.ContextWindow{UsedPercentage: new(float64(80))}}, nil)
+	high.Columns = 100
+
+	lowChunks, ok := (contextWindowSegment{}).Render(low)
+	if !ok {
+		t.Fatal("Render() ok = false, want true")
+	}
+	highChunks, ok := (contextWindowSegment{}).Render(high)
+	if !ok {
+		t.Fatal("Render() ok = false, want true")
+	}
+
+	// Both renders start with the same icon + " ⟨" chunks (indices 0-1)
+	// before the per-cell bar chunks begin at index 2.
+	const barStart = 2
+	filledAtLow, _ := style.BlockBarParts(20, 10)
+	lowFilledCount := len([]rune(filledAtLow))
+
+	for i := range lowFilledCount {
+		lowColor := lowChunks[barStart+i].FG
+		highColor := highChunks[barStart+i].FG
+		if lowColor != highColor {
+			t.Errorf("cell %d color changed between 20%% and 80%% fill: low=%+v high=%+v", i, lowColor, highColor)
+		}
+	}
+}
+
 func TestContextWindowCountsText(t *testing.T) {
 	t.Parallel()
 
