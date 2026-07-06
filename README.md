@@ -6,7 +6,7 @@ divider, truecolor, five built-in themes, and an optional TOML config file
 for anyone who wants to tweak it further.
 
 ```
-󰚩 Opus        󰊚 high    󰍛 ⟨██████▊░░░⟩ 68%    󰔟 ⟨██▌░░░⟩ 42%    󰾔 ⟨████▎░⟩ 71%    󰈤 80% (16.0k)
+󰚩 Opus        󰊚 high    󰍛 ⟨█████████████▋░░░░░░⟩ 68% 136.0k/64.0k    󰔟 ⟨██▌░░░⟩ 42%    󰾔 ⟨████▎░⟩ 71%    󰈤 79% (108.0k)
  big-refactor    󰉋 /home/user/code/statusline    +342 -58     $2.17  1:23:45
  github.com/scrothers/statusline     #128 approved     main 󰔡 2  1  3 ↑ 1    󰤨 my-feature
 ```
@@ -93,6 +93,13 @@ escalates from an empty gauge (`low`) through a full gauge (`xhigh`) to fire
 (`max`) and an alert fire (`ultra`), and its color runs a fixed green → red →
 purple scale independent of the active theme, so "getting hotter" reads the
 same everywhere.
+
+`context_window`'s bar width scales with the detected terminal width
+(clamped between 8 and 24 cells) instead of a fixed size, and its fill color
+is a smooth gradient sliding continuously from the theme's success color
+through warning to danger — not the three flat threshold bands the
+rate-limit gauges still use. It also shows a `used/remaining` token count
+next to the percentage whenever the context window size is known.
 
 ## Themes
 

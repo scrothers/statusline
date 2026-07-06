@@ -37,6 +37,34 @@ func TestParseHex(t *testing.T) {
 	}
 }
 
+func TestLerp(t *testing.T) {
+	t.Parallel()
+
+	green := RGB(0, 200, 0)
+	red := RGB(200, 0, 0)
+
+	tests := []struct {
+		name string
+		t    float64
+		want Color
+	}{
+		{name: "t=0 returns a", t: 0, want: green},
+		{name: "t=1 returns b", t: 1, want: red},
+		{name: "t=0.5 is the midpoint", t: 0.5, want: RGB(100, 100, 0)},
+		{name: "t<0 clamps to a", t: -5, want: green},
+		{name: "t>1 clamps to b", t: 5, want: red},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if got := Lerp(green, red, tt.t); got != tt.want {
+				t.Errorf("Lerp(green, red, %v) = %+v, want %+v", tt.t, got, tt.want)
+			}
+		})
+	}
+}
+
 func TestPaint(t *testing.T) {
 	t.Run("emits truecolor SGR codes", func(t *testing.T) {
 		got := Paint("hi", RGB(255, 0, 0), Default, false)

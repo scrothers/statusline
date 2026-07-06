@@ -78,8 +78,10 @@ func fullScenario() Scenario {
 			},
 			Cost: &input.Cost{TotalCostUSD: 2.17, TotalDurationMS: 5_025_000, TotalLinesAdded: 342, TotalLinesRemoved: 58},
 			ContextWindow: &input.ContextWindow{
-				UsedPercentage: new(float64(68)),
-				CurrentUsage:   &input.Usage{InputTokens: 2000, CacheCreationInputTokens: 2000, CacheReadInputTokens: 16000},
+				UsedPercentage:    new(float64(68)),
+				ContextWindowSize: 200_000,
+				TotalInputTokens:  136_000,
+				CurrentUsage:      &input.Usage{InputTokens: 20_000, CacheCreationInputTokens: 8_000, CacheReadInputTokens: 108_000},
 			},
 			RateLimits: &input.RateLimits{
 				FiveHour: &input.RateLimitWindow{UsedPercentage: 42},

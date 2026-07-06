@@ -8,9 +8,15 @@ import (
 	"github.com/scrothers/statusline/internal/theme"
 )
 
-// contextWindowGaugeWidth is the hero gauge's cell width; rate-limit gauges
-// use a narrower width (see ratelimit.go).
-const contextWindowGaugeWidth = 10
+// Bounds for the hero gauge's cell width, which scales with the detected
+// terminal width (RenderContext.Columns) instead of a fixed size — rate
+// limit gauges stay at a fixed, narrower width (see ratelimit.go).
+const (
+	contextWindowGaugeMinWidth     = 8
+	contextWindowGaugeMaxWidth     = 24
+	contextWindowGaugeDefaultWidth = 10 // used when Columns is unknown (<= 0)
+	contextWindowGaugeDivisor      = 10 // columns per gauge cell before clamping
+)
 
 // contextAlertThreshold is the percentage at or above which the context
 // gauge switches to its alarm treatment (alert icon, bold danger text),
@@ -35,26 +41,79 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	pct := contextWindowPercentage(cw)
 	nerd := rc.Config.NerdFontEnabled()
-	filled, track := style.BlockBarParts(pct, contextWindowGaugeWidth)
+	width := contextWindowGaugeWidth(rc.Columns)
+	filled, track := style.BlockBarParts(pct, width)
 	pctText := fmt.Sprintf("%.0f%%", pct)
+	countsText := contextWindowCountsText(cw)
 
 	if rc.Payload.Exceeds200k || pct >= contextAlertThreshold {
 		icon := theme.Glyph(theme.IconContextAlert, nerd)
-		return []style.Chunk{
-			{Text: icon + " ⟨" + filled + track + "⟩ " + pctText, FG: rc.Theme.Danger, Bold: true},
-		}, true
+		text := icon + " ⟨" + filled + track + "⟩ " + pctText + countsText
+		return []style.Chunk{{Text: text, FG: rc.Theme.Danger, Bold: true}}, true
 	}
 
-	color := gaugeColor(rc.Theme, pct)
+	color := contextGradientColor(rc.Theme, pct)
 	icon := theme.Glyph(theme.IconContextWindow, nerd)
-	return []style.Chunk{
+	chunks := []style.Chunk{
 		{Text: icon, FG: color},
 		{Text: " ⟨", FG: rc.Theme.Muted},
 		{Text: filled, FG: color},
 		{Text: track, FG: rc.Theme.TrackDim},
 		{Text: "⟩ ", FG: rc.Theme.Muted},
 		{Text: pctText, FG: color},
-	}, true
+	}
+	if countsText != "" {
+		chunks = append(chunks, style.Chunk{Text: countsText, FG: rc.Theme.Muted})
+	}
+	return chunks, true
+}
+
+// contextWindowGaugeWidth scales the hero gauge to the detected terminal
+// width instead of a fixed cell count, clamped so it's never so narrow the
+// gauge is meaningless nor so wide it dominates the line on huge terminals.
+func contextWindowGaugeWidth(columns int) int {
+	if columns <= 0 {
+		return contextWindowGaugeDefaultWidth
+	}
+	width := columns / contextWindowGaugeDivisor
+	switch {
+	case width < contextWindowGaugeMinWidth:
+		return contextWindowGaugeMinWidth
+	case width > contextWindowGaugeMaxWidth:
+		return contextWindowGaugeMaxWidth
+	default:
+		return width
+	}
+}
+
+// contextGradientColor returns a color that slides smoothly from the
+// theme's Success (0%) through Warning (50%) to Danger (100%), rather than
+// jumping between three flat bands the way gaugeColor does — the context
+// bar is the one gauge important enough to warrant the extra nuance.
+func contextGradientColor(th *theme.Theme, pct float64) style.Color {
+	switch {
+	case pct <= 0:
+		return th.Success
+	case pct >= 100:
+		return th.Danger
+	case pct <= 50:
+		return style.Lerp(th.Success, th.Warning, pct/50)
+	default:
+		return style.Lerp(th.Warning, th.Danger, (pct-50)/50)
+	}
+}
+
+// contextWindowCountsText renders " used/remaining" (token counts, not
+// percentages) when the context window size is known, or "" when it isn't
+// (e.g. before the first API response) — it's supplementary detail, so it
+// simply doesn't appear rather than showing placeholder zeros.
+func contextWindowCountsText(cw *input.ContextWindow) string {
+	if cw.ContextWindowSize <= 0 {
+		return ""
+	}
+	used := cw.TotalInputTokens
+	remaining := max(cw.ContextWindowSize-used, 0)
+	return " " + formatTokenCount(used) + "/" + formatTokenCount(remaining)
 }
 
 // contextWindowPercentage prefers the pre-calculated UsedPercentage, falling
