@@ -29,6 +29,23 @@ Or, once a release exists:
 go install github.com/scrothers/statusline/cmd/statusline@latest
 ```
 
+## Preview it
+
+`statusline demo` renders built-in sample payloads directly — no need to
+craft JSON fixtures or wire up Claude Code first:
+
+```sh
+./statusline demo                                  # "full" scenario, all 5 themes
+./statusline demo --theme dracula                   # one theme only
+./statusline demo --theme nord --scenario minimal    # early-session look
+./statusline demo --scenario narrow --columns 40     # test width-based truncation
+```
+
+Scenarios: `minimal` (early session, no git repo yet), `full` (every segment
+at once — dirty repo, open PR, context/cost/rate-limit data, all bonus
+badges), `narrow` (the `full` payload rendered at 30 columns, to see which
+segments drop first).
+
 ## Configure Claude Code
 
 Add to `~/.claude/settings.json`:

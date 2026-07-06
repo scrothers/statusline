@@ -14,7 +14,7 @@ func TestLoadRegistry(t *testing.T) {
 		t.Fatalf("LoadRegistry() error = %v", err)
 	}
 
-	want := []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"}
+	want := Names()
 	if len(registry) != len(want) {
 		t.Fatalf("LoadRegistry() returned %d themes, want %d", len(registry), len(want))
 	}
@@ -30,6 +30,24 @@ func TestLoadRegistry(t *testing.T) {
 		if !th.Success.Valid || !th.Warning.Valid || !th.Danger.Valid || !th.Info.Valid || !th.Muted.Valid {
 			t.Errorf("registry[%q] has an unparsed semantic color: %+v", name, th)
 		}
+	}
+}
+
+func TestNames(t *testing.T) {
+	t.Parallel()
+
+	got := Names()
+	if len(got) != 5 {
+		t.Fatalf("Names() = %v, want 5 entries", got)
+	}
+	if got[0] != DefaultName {
+		t.Errorf("Names()[0] = %q, want DefaultName %q (default listed first)", got[0], DefaultName)
+	}
+
+	// Mutating the returned slice must not affect the next call's result.
+	got[0] = "mutated"
+	if again := Names(); again[0] != DefaultName {
+		t.Errorf("Names() after mutating a prior result = %v, want unaffected", again)
 	}
 }
 

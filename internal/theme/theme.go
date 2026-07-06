@@ -19,6 +19,18 @@ var themeFS embed.FS
 // configured name doesn't match a built-in theme.
 const DefaultName = "gruvbox"
 
+// names is the built-in theme list in a fixed display order (matching the
+// README's theme table), since a map (as LoadRegistry returns) has no
+// stable iteration order.
+var names = []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"}
+
+// Names returns the built-in theme names in a fixed, stable display order.
+func Names() []string {
+	out := make([]string, len(names))
+	copy(out, names)
+	return out
+}
+
 // Theme is the resolved color-token palette segments render against. Every
 // theme fills the same fields, so rendering code never branches on theme
 // name — it reads roles like Success/Warning/Danger uniformly.

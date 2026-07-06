@@ -126,3 +126,54 @@ func TestE2E_noColorProducesPlainText(t *testing.T) {
 		t.Errorf("output = %q, want it to contain Opus", out)
 	}
 }
+
+func TestE2E_demoDefaultShowsAllThemes(t *testing.T) {
+	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo")
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	for _, theme := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"} {
+		if !strings.Contains(out, theme) {
+			t.Errorf("demo output missing theme header %q:\n%s", theme, out)
+		}
+	}
+	if !strings.Contains(out, "Opus") {
+		t.Errorf("demo output (full scenario) missing model name:\n%s", out)
+	}
+}
+
+func TestE2E_demoSingleThemeAndScenario(t *testing.T) {
+	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "dracula", "--scenario", "minimal")
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if strings.Contains(out, "──") {
+		t.Errorf("single-theme demo should not print a theme header:\n%s", out)
+	}
+	if !strings.Contains(out, "Sonnet") {
+		t.Errorf("demo output (minimal scenario) missing model name:\n%s", out)
+	}
+	if strings.Contains(out, "$") {
+		t.Errorf("minimal scenario should have no cost segment:\n%s", out)
+	}
+}
+
+func TestE2E_demoUnknownScenarioErrors(t *testing.T) {
+	_, code := run(t, "", nil, "demo", "--scenario", "not-a-scenario")
+	if code == 0 {
+		t.Error("exit code = 0, want non-zero for an unknown scenario")
+	}
+}
+
+func TestE2E_demoNarrowScenarioDropsBadges(t *testing.T) {
+	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "gruvbox", "--scenario", "narrow")
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "Opus") {
+		t.Errorf("model must survive even in the narrow scenario:\n%s", out)
+	}
+	if strings.Contains(out, "reviewer") {
+		t.Errorf("bonus badge (agent) should be dropped in the narrow scenario:\n%s", out)
+	}
+}
