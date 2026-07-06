@@ -21,8 +21,8 @@ func (sessionNameSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 	icon := theme.Glyph(theme.IconSessionName, rc.Config.NerdFontEnabled())
 	return []style.Chunk{
-		{Text: icon, FG: rc.Theme.Muted},
-		{Text: " " + rc.Payload.SessionName, FG: rc.Theme.TextPrimary},
+		{Text: icon, FG: rc.Theme.IdentityAccent},
+		{Text: " " + rc.Payload.SessionName, FG: rc.Theme.IdentityText},
 	}, true
 }
 
@@ -40,12 +40,16 @@ func (linesChangedSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 		return nil, false
 	}
 
+	nerd := rc.Config.NerdFontEnabled()
+
 	var chunks []style.Chunk
 	if cost.TotalLinesAdded > 0 {
-		chunks = append(chunks, style.Chunk{Text: fmt.Sprintf("+%d", cost.TotalLinesAdded), FG: rc.Theme.Success})
+		icon := theme.Glyph(theme.IconLinesAdded, nerd)
+		chunks = append(chunks, style.Chunk{Text: fmt.Sprintf("%s +%d", icon, cost.TotalLinesAdded), FG: rc.Theme.Success})
 	}
 	if cost.TotalLinesRemoved > 0 {
-		text := fmt.Sprintf("-%d", cost.TotalLinesRemoved)
+		icon := theme.Glyph(theme.IconLinesRemoved, nerd)
+		text := fmt.Sprintf("%s -%d", icon, cost.TotalLinesRemoved)
 		if len(chunks) > 0 {
 			text = " " + text
 		}

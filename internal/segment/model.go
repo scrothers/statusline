@@ -23,6 +23,6 @@ func (modelSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	icon := theme.Glyph(theme.IconModel, rc.Config.NerdFontEnabled())
 	return []style.Chunk{
 		{Text: icon, FG: rc.Theme.IdentityAccent},
-		{Text: " " + rc.Payload.Model.DisplayName, FG: rc.Theme.TextPrimary},
+		{Text: " " + rc.Payload.Model.DisplayName, FG: rc.Theme.IdentityText},
 	}, true
 }

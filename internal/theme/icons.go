@@ -38,6 +38,8 @@ const (
 	IconEffortXHigh       = "effort_xhigh"
 	IconEffortMax         = "effort_max"
 	IconEffortUltra       = "effort_ultra"
+	IconLinesAdded        = "lines_added"
+	IconLinesRemoved      = "lines_removed"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -91,6 +93,8 @@ var Icons = map[string]Icon{
 	IconEffortXHigh:       {Glyph: "\U000F0874", Fallback: "xhigh"},     // nf-md-gauge_full
 	IconEffortMax:         {Glyph: "\U000F0238", Fallback: "max"},       // nf-md-fire
 	IconEffortUltra:       {Glyph: "\U000F15D7", Fallback: "ultra"},     // nf-md-fire_alert
+	IconLinesAdded:        {Glyph: "\uF457", Fallback: "+"},             // nf-oct-diff_added
+	IconLinesRemoved:      {Glyph: "\uF458", Fallback: "-"},             // nf-oct-diff_removed
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,
