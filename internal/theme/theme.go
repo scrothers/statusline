@@ -33,10 +33,12 @@ func Names() []string {
 
 // Theme is the resolved color-token palette segments render against. Every
 // theme fills the same fields, so rendering code never branches on theme
-// name — it reads roles like Success/Warning/Danger uniformly.
+// name — it reads roles like Success/Warning/Danger uniformly. There is
+// deliberately no background token: the statusline never paints a
+// background, only foreground text and icons, so a theme is a foreground
+// palette only.
 type Theme struct {
 	Name                         string
-	Line1Bg, Line2Bg, Line3Bg    style.Color
 	IdentityAccent, IdentityText style.Color
 	TextPrimary, TextSecondary   style.Color
 	Success, Warning, Danger     style.Color
@@ -47,9 +49,6 @@ type Theme struct {
 type rawTheme struct {
 	Name   string `toml:"name"`
 	Colors struct {
-		Line1Bg        string `toml:"line1_bg"`
-		Line2Bg        string `toml:"line2_bg"`
-		Line3Bg        string `toml:"line3_bg"`
 		IdentityAccent string `toml:"identity_accent"`
 		IdentityText   string `toml:"identity_text"`
 		TextPrimary    string `toml:"text_primary"`
@@ -105,9 +104,6 @@ func (r rawTheme) resolve() (Theme, error) {
 
 	t := Theme{
 		Name:           r.Name,
-		Line1Bg:        parse(r.Colors.Line1Bg),
-		Line2Bg:        parse(r.Colors.Line2Bg),
-		Line3Bg:        parse(r.Colors.Line3Bg),
 		IdentityAccent: parse(r.Colors.IdentityAccent),
 		IdentityText:   parse(r.Colors.IdentityText),
 		TextPrimary:    parse(r.Colors.TextPrimary),
@@ -144,9 +140,6 @@ func Resolve(registry map[string]Theme, name string) (Theme, string) {
 // fields, not a value-receiver copy's.
 func (t *Theme) tokenSetters() map[string]*style.Color {
 	return map[string]*style.Color{
-		"line1_bg":        &t.Line1Bg,
-		"line2_bg":        &t.Line2Bg,
-		"line3_bg":        &t.Line3Bg,
 		"identity_accent": &t.IdentityAccent,
 		"identity_text":   &t.IdentityText,
 		"text_primary":    &t.TextPrimary,

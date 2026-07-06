@@ -54,6 +54,7 @@ func TestRegistry(t *testing.T) {
 	wantIDs := []string{
 		"model", "directory", "git", "context_window", "cost",
 		"ratelimit_5h", "ratelimit_7d", "pr", "vim", "agent", "effort", "output_style",
+		"thinking", "cache", "session_name", "lines_changed", "repo", "worktree",
 	}
 	if len(reg) != len(wantIDs) {
 		t.Fatalf("Registry() has %d segments, want %d", len(reg), len(wantIDs))

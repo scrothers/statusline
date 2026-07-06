@@ -18,9 +18,6 @@ func mergeInto(base *Config, overlay Config) {
 	if overlay.NerdFont != nil {
 		base.NerdFont = overlay.NerdFont
 	}
-	if overlay.Separator.Style != "" {
-		base.Separator.Style = overlay.Separator.Style
-	}
 	if len(overlay.Lines) > 0 {
 		base.Lines = overlay.Lines
 	}

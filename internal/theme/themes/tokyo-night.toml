@@ -1,9 +1,6 @@
 name = "tokyo-night"
 
 [colors]
-line1_bg        = "#1a1b26"
-line2_bg        = "#1a1b26"
-line3_bg        = "#292e42"
 identity_accent = "#bb9af7"
 identity_text   = "#a9b1d6"
 text_primary    = "#c0caf5"

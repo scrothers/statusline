@@ -1,9 +1,6 @@
 name = "nord"
 
 [colors]
-line1_bg        = "#2e3440"
-line2_bg        = "#2e3440"
-line3_bg        = "#3b4252"
 identity_accent = "#88c0d0"
 identity_text   = "#d8dee9"
 text_primary    = "#eceff4"

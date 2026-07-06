@@ -6,17 +6,8 @@ import (
 	"github.com/scrothers/statusline/internal/style"
 )
 
-func pillSegment(id string, priority int, text string, bg style.Color) lineSegment {
-	return lineSegment{id: id, priority: priority, chunks: []style.Chunk{{Text: text, BG: bg}}, bg: bg}
-}
-
-func badgeSegment(id string, priority int, text string) lineSegment {
-	return lineSegment{id: id, priority: priority, chunks: []style.Chunk{{Text: text, BG: style.Default}}, bg: style.Default}
-}
-
-func withBreakBefore(s lineSegment) lineSegment {
-	s.breakBefore = true
-	return s
+func seg(id string, priority int, text string) lineSegment {
+	return lineSegment{id: id, priority: priority, chunks: []style.Chunk{{Text: text}}}
 }
 
 func TestChunksWidth(t *testing.T) {
@@ -29,7 +20,6 @@ func TestChunksWidth(t *testing.T) {
 
 func TestLineWidth(t *testing.T) {
 	t.Parallel()
-	bg := style.RGB(1, 2, 3)
 
 	tests := []struct {
 		name string
@@ -37,41 +27,16 @@ func TestLineWidth(t *testing.T) {
 		want int
 	}{
 		{name: "empty", segs: nil, want: 0},
+		{name: "single segment: just its content", segs: []lineSegment{seg("a", 100, "abc")}, want: 3},
 		{
-			name: "single pill: content + open + close cap",
-			segs: []lineSegment{pillSegment("a", 100, "abc", bg)},
-			want: 3 + 2,
+			name: "two segments: content + one divider",
+			segs: []lineSegment{seg("a", 100, "ab"), seg("b", 90, "cd")},
+			want: 2 + 2 + dividerWidth,
 		},
 		{
-			name: "two pills: content + 2 caps + 1 connector",
-			segs: []lineSegment{pillSegment("a", 100, "ab", bg), pillSegment("b", 90, "cd", bg)},
-			want: 2 + 2 + 2 + 1,
-		},
-		{
-			name: "pill then badge: content + open cap + close cap + space, no trailing cap",
-			segs: []lineSegment{pillSegment("a", 100, "ab", bg), badgeSegment("b", 30, "cd")},
-			want: 2 + 2 + 1 /*open cap*/ + 2, /*close cap + space*/
-		},
-		{
-			name: "two badges: content + divider, no caps",
-			segs: []lineSegment{badgeSegment("a", 30, "ab"), badgeSegment("b", 30, "cd")},
-			want: 2 + 2 + 3,
-		},
-		{
-			name: "gap between two same-bg pills forces a taper instead of a connector",
-			segs: []lineSegment{
-				pillSegment("a", 90, "ab", bg),
-				withBreakBefore(pillSegment("b", 80, "cd", bg)),
-			},
-			want: 2 + 2 /*content*/ + 2 /*outer open/close caps*/ + 1 /*taper close*/ + 1 /*gap space*/ + 1, /*taper open*/
-		},
-		{
-			name: "gap before a badge costs the same as a natural pill-badge transition",
-			segs: []lineSegment{
-				pillSegment("a", 90, "ab", bg),
-				withBreakBefore(badgeSegment("b", 30, "cd")),
-			},
-			want: 2 + 2 /*content*/ + 1 /*outer open cap*/ + 1 /*taper close*/ + 1, /*gap space, no open cap for a badge*/
+			name: "three segments: content + two dividers",
+			segs: []lineSegment{seg("a", 100, "ab"), seg("b", 90, "cd"), seg("c", 80, "ef")},
+			want: 2 + 2 + 2 + 2*dividerWidth,
 		},
 	}
 
@@ -87,11 +52,10 @@ func TestLineWidth(t *testing.T) {
 
 func TestFitToWidth(t *testing.T) {
 	t.Parallel()
-	bg := style.RGB(1, 2, 3)
 
 	t.Run("fits already, unchanged", func(t *testing.T) {
 		t.Parallel()
-		segs := []lineSegment{pillSegment("model", 100, "abc", bg)}
+		segs := []lineSegment{seg("model", 100, "abc")}
 		got := fitToWidth(segs, 80)
 		if len(got) != 1 {
 			t.Fatalf("fitToWidth() = %v, want unchanged", got)
@@ -100,7 +64,7 @@ func TestFitToWidth(t *testing.T) {
 
 	t.Run("zero columns means no truncation", func(t *testing.T) {
 		t.Parallel()
-		segs := []lineSegment{pillSegment("model", 100, "a very long piece of text indeed", bg)}
+		segs := []lineSegment{seg("model", 100, "a very long piece of text indeed")}
 		got := fitToWidth(segs, 0)
 		if len(got) != 1 {
 			t.Fatalf("fitToWidth(0) dropped segments, want no-op")
@@ -110,12 +74,13 @@ func TestFitToWidth(t *testing.T) {
 	t.Run("drops lowest priority first", func(t *testing.T) {
 		t.Parallel()
 		segs := []lineSegment{
-			pillSegment("model", 100, "0123456789", bg),
-			badgeSegment("vim", 30, "0123456789"),
-			pillSegment("cost", 60, "0123456789", bg),
+			seg("model", 100, "0123456789"),
+			seg("vim", 30, "0123456789"),
+			seg("cost", 60, "0123456789"),
 		}
-		// Full width ~= 10*3 + caps ≈ way more than 15; only "model" (priority
-		// 100, protected) should remain once everything droppable is dropped.
+		// Full width ~= 10*3 + dividers ≈ way more than 15; only "model"
+		// (priority 100, protected) should remain once everything droppable
+		// is dropped.
 		got := fitToWidth(segs, 15)
 		if len(got) != 1 || got[0].id != "model" {
 			t.Fatalf("fitToWidth() = %v, want only model", got)
@@ -125,8 +90,8 @@ func TestFitToWidth(t *testing.T) {
 	t.Run("never drops priority >= 100", func(t *testing.T) {
 		t.Parallel()
 		segs := []lineSegment{
-			pillSegment("model", 100, "0123456789", bg),
-			pillSegment("directory", 100, "0123456789", bg),
+			seg("model", 100, "0123456789"),
+			seg("directory", 100, "0123456789"),
 		}
 		got := fitToWidth(segs, 1) // impossibly narrow
 		if len(got) != 2 {
@@ -137,9 +102,9 @@ func TestFitToWidth(t *testing.T) {
 	t.Run("drops just enough to fit", func(t *testing.T) {
 		t.Parallel()
 		segs := []lineSegment{
-			pillSegment("model", 100, "model", bg),
-			badgeSegment("output_style", 20, "0123456789012345"),
-			badgeSegment("vim", 30, "0123456789012345"),
+			seg("model", 100, "model"),
+			seg("output_style", 20, "0123456789012345"),
+			seg("vim", 30, "0123456789012345"),
 		}
 		full := lineWidth(segs)
 		got := fitToWidth(segs, full-1) // force exactly one drop

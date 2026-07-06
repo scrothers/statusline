@@ -9,8 +9,8 @@ import (
 )
 
 // rateLimitGaugeWidth is narrower than the context window's hero gauge
-// (contextWindowGaugeWidth) to conserve line-3 width for two of them plus
-// cost, duration, and bonus badges.
+// (contextWindowGaugeWidth) to conserve room for the rest of the Claude
+// info line.
 const rateLimitGaugeWidth = 6
 
 // rateLimitWindow distinguishes the two independently-absent rate-limit
@@ -61,13 +61,12 @@ func (s rateLimitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 		return nil, false
 	}
 
-	bg := rc.Theme.Line3Bg
 	color := gaugeColor(rc.Theme, win.UsedPercentage)
 	bar := style.BlockBar(win.UsedPercentage, rateLimitGaugeWidth)
 	icon := theme.Glyph(iconKey, rc.Config.NerdFontEnabled())
 
 	return []style.Chunk{
-		{Text: " " + icon + bar, FG: color, BG: bg},
-		{Text: fmt.Sprintf(" %.0f%% ", win.UsedPercentage), FG: color, BG: bg},
+		{Text: icon + bar, FG: color},
+		{Text: fmt.Sprintf(" %.0f%%", win.UsedPercentage), FG: color},
 	}, true
 }

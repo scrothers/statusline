@@ -62,26 +62,33 @@ func minimalScenario() Scenario {
 	}
 }
 
-// fullScenario exercises every segment at once: dirty git repo, an
-// approved PR, context/cost/rate-limit data, and every bonus badge.
+// fullScenario exercises every default-layout segment at once: the Claude
+// line (model/thinking/effort/context/rate-limits/cache), the session line
+// (session name/directory/lines changed/cost), and the git line
+// (repo/PR/branch+status/worktree).
 func fullScenario() Scenario {
 	return Scenario{
 		Name: "full",
 		Payload: &input.Payload{
-			Model:     &input.Model{DisplayName: "Opus"},
-			Workspace: &input.Workspace{CurrentDir: "/home/user/code/statusline"},
-			Cost:      &input.Cost{TotalCostUSD: 2.17, TotalDurationMS: 5_025_000},
+			SessionName: "big-refactor",
+			Model:       &input.Model{DisplayName: "Opus"},
+			Workspace: &input.Workspace{
+				CurrentDir: "/home/user/code/statusline",
+				Repo:       &input.Repo{Host: "github.com", Owner: "scrothers", Name: "statusline"},
+			},
+			Cost: &input.Cost{TotalCostUSD: 2.17, TotalDurationMS: 5_025_000, TotalLinesAdded: 342, TotalLinesRemoved: 58},
 			ContextWindow: &input.ContextWindow{
 				UsedPercentage: new(float64(68)),
+				CurrentUsage:   &input.Usage{InputTokens: 2000, CacheCreationInputTokens: 2000, CacheReadInputTokens: 16000},
 			},
 			RateLimits: &input.RateLimits{
 				FiveHour: &input.RateLimitWindow{UsedPercentage: 42},
 				SevenDay: &input.RateLimitWindow{UsedPercentage: 71},
 			},
-			Vim:    &input.Vim{Mode: "INSERT"},
-			Agent:  &input.Agent{Name: "reviewer"},
-			Effort: &input.Effort{Level: "high"},
-			PR:     &input.PR{Number: 128, ReviewState: "approved"},
+			Thinking: &input.Thinking{Enabled: true},
+			Effort:   &input.Effort{Level: "high"},
+			PR:       &input.PR{Number: 128, URL: "https://github.com/scrothers/statusline/pull/128", ReviewState: "approved"},
+			Worktree: &input.Worktree{Name: "my-feature"},
 		},
 		Git:     &gitstatus.Status{Branch: "main", Staged: 2, Modified: 1, Untracked: 3, Ahead: 1},
 		Columns: defaultDemoColumns,

@@ -6,7 +6,6 @@ type Config struct {
 	Theme          string                   `toml:"theme"`
 	ThemeOverrides map[string]string        `toml:"theme_overrides"`
 	NerdFont       *bool                    `toml:"nerd_font"`
-	Separator      SeparatorConfig          `toml:"separator"`
 	Lines          []LineConfig             `toml:"lines"`
 	Segments       map[string]SegmentConfig `toml:"segments"`
 	Git            GitConfig                `toml:"git"`
@@ -17,13 +16,6 @@ type Config struct {
 // to true when unset.
 func (c Config) NerdFontEnabled() bool {
 	return c.NerdFont == nil || *c.NerdFont
-}
-
-// SeparatorConfig selects the powerline cap/connector glyph style.
-type SeparatorConfig struct {
-	// Style is "rounded" or "hard". Empty means unset (fall back to the
-	// built-in default's value during merge).
-	Style string `toml:"style"`
 }
 
 // LineConfig lists the segment IDs, in order, rendered on one output line.

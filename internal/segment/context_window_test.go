@@ -70,8 +70,11 @@ func TestContextWindowSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		if chunks[0].BG != rc.Theme.Danger {
-			t.Errorf("alarm tier BG = %+v, want theme.Danger %+v", chunks[0].BG, rc.Theme.Danger)
+		if chunks[0].FG != rc.Theme.Danger {
+			t.Errorf("alarm tier FG = %+v, want theme.Danger %+v", chunks[0].FG, rc.Theme.Danger)
+		}
+		if !chunks[0].Bold {
+			t.Error("alarm tier should render bold")
 		}
 	})
 
@@ -82,8 +85,8 @@ func TestContextWindowSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		if chunks[0].BG != rc.Theme.Danger {
-			t.Errorf("alarm tier BG = %+v, want theme.Danger %+v", chunks[0].BG, rc.Theme.Danger)
+		if chunks[0].FG != rc.Theme.Danger {
+			t.Errorf("alarm tier FG = %+v, want theme.Danger %+v", chunks[0].FG, rc.Theme.Danger)
 		}
 	})
 
@@ -94,8 +97,8 @@ func TestContextWindowSegment(t *testing.T) {
 		if !ok {
 			t.Fatal("Render() ok = false, want true")
 		}
-		if chunks[0].BG == rc.Theme.Danger {
-			t.Errorf("non-alarm tier should not paint the whole pill danger")
+		if chunks[0].Bold {
+			t.Error("non-alarm tier should not render bold")
 		}
 	})
 }

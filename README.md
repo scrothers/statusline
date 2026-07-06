@@ -1,14 +1,14 @@
 # statusline
 
 A single-binary, themeable [Claude Code statusLine](https://code.claude.com/docs/en/statusline)
-command written in Go. Powerline-style segments, Nerd Font icons, truecolor,
-five built-in themes, and an optional TOML config file for anyone who wants
-to tweak it further.
+command written in Go. Flat, no-background segments joined by a Nerd Font
+divider, truecolor, five built-in themes, and an optional TOML config file
+for anyone who wants to tweak it further.
 
 ```
- 󰚩 Opus  󰉋 /home/user/code/statusline 
-  main 󰔡2 1 3 ↑1    #128 
- 󰍛 ⟨██████▊░░░⟩ 68%   $2.17 1:23:45   󰔟██▌░░░ 42%  󰾔████▎░ 71%  INSERT · 󰤄 reviewer · high
+󰚩 Opus    high  󰍛 ⟨██████▊░░░⟩ 68%  󰔟██▌░░░ 42%  󰾔████▎░ 71%  󰈤 80% (16.0k)
+ big-refactor  󰉋 /home/user/code/statusline  +342 -58  $2.17 1:23:45
+ github.com/scrothers/statusline   #128 approved   main 󰔡2 1 3 ↑1  󰤨 my-feature
 ```
 
 (a real render — `statusline demo --theme gruvbox --scenario full`)
@@ -42,9 +42,9 @@ craft JSON fixtures or wire up Claude Code first:
 ```
 
 Scenarios: `minimal` (early session, no git repo yet), `full` (every segment
-at once — dirty repo, open PR, context/cost/rate-limit data, all bonus
-badges), `narrow` (the `full` payload rendered at 30 columns, to see which
-segments drop first).
+at once — dirty repo, open PR, context/cost/rate-limit/cache data, a named
+session, a worktree), `narrow` (the `full` payload rendered at 30 columns, to
+see which segments drop first).
 
 ## Configure Claude Code
 
@@ -66,20 +66,34 @@ Add to `~/.claude/settings.json`:
   ticking during long idle stretches (a slow tool call, a background
   subagent), not just after each assistant message.
 - `hideVimModeIndicator: true` suppresses Claude Code's built-in
-  `-- INSERT --` text, since the vim badge already shows the mode.
+  `-- INSERT --` text, since the vim badge already shows the mode when
+  enabled in config (see [Segments](#segments)).
 
 ## Segments
 
+Three lines, each answering one question. Every segment is plain colored
+text — no background is ever painted, so lines read as flat, breathing
+text joined by a thin chevron divider ( `` ), not powerline pills.
+
 | Line | Segments | Notes |
 |---|---|---|
-| 1 — identity | model, directory | Always shown; directory breadcrumb-truncates under width pressure. |
-| 2 — repo | git branch/status, open PR | Omitted entirely outside a git repository. |
-| 3 — vitals | context window, cost + duration, rate limits (5h/7d), bonus badges (vim mode, agent name, effort level, output style) | Bonus badges are the first thing dropped in a narrow terminal. |
+| 1 — Claude | model, thinking, effort, context window, rate limits (5h/7d), cache | The model's own state: what it's running, how hard, and how much room/budget is left. |
+| 2 — session | session name, directory, lines added/removed, session cost + duration | Omitted fields (no custom name, no diff yet) just don't appear. |
+| 3 — git | repo (host/owner/name), open PR (number + review state), branch + status, worktree | The whole line disappears outside a git repository. |
+
+Segments not in the default layout but still available via custom config:
+`vim` (vim mode), `agent` (subagent name), `output_style`. These render with
+no background either — they just aren't wired into any line by default.
+
+Under width pressure, segments drop in priority order (lowest first) until
+a line fits; model and directory never drop, only self-truncate.
 
 ## Themes
 
 Five built-in themes, selected with `theme = "<name>"` in config or
-`--theme <name>` on the command line. `gruvbox` is the default.
+`--theme <name>` on the command line. `gruvbox` is the default. Themes are
+foreground-only palettes (identity accent + success/warning/danger/info/muted
+roles) — there's no background token, since the statusline never paints one.
 
 | Name | Style |
 |---|---|
@@ -114,26 +128,22 @@ enabled = false
 success = "#00ff00"
 ```
 
-If you take over `lines[].segments` entirely, `"gap"` is a reserved entry
-that inserts breathing room — a plain space tapering to the terminal's own
-background on both sides — before the next segment, instead of the usual
-connector. It's what separates unrelated clusters that would otherwise glue
-together just because they share a background color (e.g. the context bar
-from cost+duration on the default vitals line); it never adds background
-color, only a real gap:
+Take over `lines[].segments` entirely to reorder, drop, or add segments —
+see the [Segments](#segments) table for every available ID:
 
 ```toml
 [[lines]]
 enabled = true
-segments = ["context_window", "gap", "cost", "gap", "ratelimit_5h", "ratelimit_7d"]
+segments = ["model", "context_window", "cache"]
 ```
 
 ## Requirements
 
 - A [Nerd Font](https://www.nerdfonts.com/) in your terminal for the icons
-  and powerline separators. Without one, set `nerd_font = false` in config
-  to fall back to plain Unicode/ASCII for every icon.
-- `git` on `PATH` for the repository segment; everything else works without it.
+  and the divider glyph. Without one, set `nerd_font = false` in config to
+  fall back to plain Unicode/ASCII for every icon.
+- `git` on `PATH` for the repo/branch/PR segments; everything else works
+  without it.
 
 ## Development
 

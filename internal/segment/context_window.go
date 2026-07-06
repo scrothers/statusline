@@ -13,8 +13,9 @@ import (
 const contextWindowGaugeWidth = 10
 
 // contextAlertThreshold is the percentage at or above which the context
-// gauge switches to its full-invert alarm treatment, reserved for this one
-// signal so it isn't diluted by other segments also going solid-red.
+// gauge switches to its alarm treatment (alert icon, bold danger text),
+// reserved for this one signal so it isn't diluted by other segments also
+// using danger coloring.
 const contextAlertThreshold = 95.0
 
 // contextWindowSegment renders the context-window usage gauge: the
@@ -34,24 +35,24 @@ func (contextWindowSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 
 	pct := contextWindowPercentage(cw)
 	nerd := rc.Config.NerdFontEnabled()
-	bg := rc.Theme.Line3Bg
 	bar := style.BlockBar(pct, contextWindowGaugeWidth)
 	pctText := fmt.Sprintf("%.0f%%", pct)
 
 	if rc.Payload.Exceeds200k || pct >= contextAlertThreshold {
 		icon := theme.Glyph(theme.IconContextAlert, nerd)
-		text := " " + icon + " ⟨" + bar + "⟩ " + pctText + " "
-		return []style.Chunk{{Text: text, FG: rc.Theme.Line3Bg, BG: rc.Theme.Danger, Bold: true}}, true
+		return []style.Chunk{
+			{Text: icon + " ⟨" + bar + "⟩ " + pctText, FG: rc.Theme.Danger, Bold: true},
+		}, true
 	}
 
 	color := gaugeColor(rc.Theme, pct)
 	icon := theme.Glyph(theme.IconContextWindow, nerd)
 	return []style.Chunk{
-		{Text: " " + icon, FG: color, BG: bg},
-		{Text: " ⟨", FG: rc.Theme.Muted, BG: bg},
-		{Text: bar, FG: color, BG: bg},
-		{Text: "⟩ ", FG: rc.Theme.Muted, BG: bg},
-		{Text: pctText + " ", FG: color, BG: bg},
+		{Text: icon, FG: color},
+		{Text: " ⟨", FG: rc.Theme.Muted},
+		{Text: bar, FG: color},
+		{Text: "⟩ ", FG: rc.Theme.Muted},
+		{Text: pctText, FG: color},
 	}, true
 }
 

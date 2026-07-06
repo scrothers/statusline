@@ -165,7 +165,7 @@ func TestE2E_demoUnknownScenarioErrors(t *testing.T) {
 	}
 }
 
-func TestE2E_demoNarrowScenarioDropsBadges(t *testing.T) {
+func TestE2E_demoNarrowScenarioDropsLowPriority(t *testing.T) {
 	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "gruvbox", "--scenario", "narrow")
 	if code != 0 {
 		t.Errorf("exit code = %d, want 0", code)
@@ -173,7 +173,7 @@ func TestE2E_demoNarrowScenarioDropsBadges(t *testing.T) {
 	if !strings.Contains(out, "Opus") {
 		t.Errorf("model must survive even in the narrow scenario:\n%s", out)
 	}
-	if strings.Contains(out, "reviewer") {
-		t.Errorf("bonus badge (agent) should be dropped in the narrow scenario:\n%s", out)
+	if strings.Contains(out, "16.0k") {
+		t.Errorf("cache (lowest priority on the Claude line) should be dropped in the narrow scenario:\n%s", out)
 	}
 }

@@ -12,7 +12,7 @@ type costSegment struct{}
 
 func (costSegment) ID() string { return "cost" }
 
-func (costSegment) Priority() int { return 60 }
+func (costSegment) Priority() int { return 70 }
 
 func (costSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	cost := rc.Payload.Cost
@@ -21,13 +21,12 @@ func (costSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	}
 
 	nerd := rc.Config.NerdFontEnabled()
-	bg := rc.Theme.Line3Bg
 	costText := fmt.Sprintf("$%.2f", cost.TotalCostUSD)
 	durText := formatClock(cost.TotalDurationMS)
 
 	return []style.Chunk{
-		{Text: " " + theme.Glyph(theme.IconCost, nerd) + costText, FG: rc.Theme.Info, BG: bg},
-		{Text: " " + theme.Glyph(theme.IconDuration, nerd) + durText + " ", FG: rc.Theme.Info, BG: bg},
+		{Text: theme.Glyph(theme.IconCost, nerd) + costText, FG: rc.Theme.Info},
+		{Text: " " + theme.Glyph(theme.IconDuration, nerd) + durText, FG: rc.Theme.Info},
 	}, true
 }
 

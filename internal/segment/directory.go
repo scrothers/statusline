@@ -34,11 +34,10 @@ func (directorySegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	home, _ := os.UserHomeDir()
 	text := breadcrumb(dir, home, directoryMaxLen)
 
-	bg := rc.Theme.Line1Bg
 	icon := theme.Glyph(theme.IconDirectory, rc.Config.NerdFontEnabled())
 	return []style.Chunk{
-		{Text: " " + icon, FG: rc.Theme.IdentityAccent, BG: bg},
-		{Text: " " + text + " ", FG: rc.Theme.IdentityText, BG: bg},
+		{Text: icon, FG: rc.Theme.IdentityAccent},
+		{Text: " " + text, FG: rc.Theme.IdentityText},
 	}, true
 }
 

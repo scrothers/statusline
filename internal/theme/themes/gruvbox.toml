@@ -1,9 +1,6 @@
 name = "gruvbox"
 
 [colors]
-line1_bg        = "#282828"
-line2_bg        = "#282828"
-line3_bg        = "#3c3836"
 identity_accent = "#fe8019"
 identity_text   = "#d5c4a1"
 text_primary    = "#ebdbb2"

@@ -1,9 +1,6 @@
 name = "catppuccin-mocha"
 
 [colors]
-line1_bg        = "#1e1e2e"
-line2_bg        = "#1e1e2e"
-line3_bg        = "#313244"
 identity_accent = "#cba6f7"
 identity_text   = "#bac2de"
 text_primary    = "#cdd6f4"

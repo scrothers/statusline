@@ -20,10 +20,9 @@ func (modelSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	if rc.Payload.Model == nil || rc.Payload.Model.DisplayName == "" {
 		return nil, false
 	}
-	bg := rc.Theme.Line1Bg
 	icon := theme.Glyph(theme.IconModel, rc.Config.NerdFontEnabled())
 	return []style.Chunk{
-		{Text: " " + icon, FG: rc.Theme.IdentityAccent, BG: bg},
-		{Text: " " + rc.Payload.Model.DisplayName + " ", FG: rc.Theme.TextPrimary, BG: bg},
+		{Text: icon, FG: rc.Theme.IdentityAccent},
+		{Text: " " + rc.Payload.Model.DisplayName, FG: rc.Theme.TextPrimary},
 	}, true
 }

@@ -49,6 +49,12 @@ func Registry() map[string]Segment {
 		agentSegment{},
 		effortSegment{},
 		outputStyleSegment{},
+		thinkingSegment{},
+		cacheSegment{},
+		sessionNameSegment{},
+		linesChangedSegment{},
+		repoSegment{},
+		worktreeSegment{},
 	}
 	reg := make(map[string]Segment, len(segments))
 	for _, s := range segments {

@@ -1,9 +1,6 @@
 name = "dracula"
 
 [colors]
-line1_bg        = "#282a36"
-line2_bg        = "#282a36"
-line3_bg        = "#44475a"
 identity_accent = "#ff79c6"
 identity_text   = "#f8f8f2"
 text_primary    = "#f8f8f2"
