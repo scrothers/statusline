@@ -123,7 +123,7 @@ func TestResolve(t *testing.T) {
 		wantName    string
 		wantWarning bool
 	}{
-		{name: "empty defaults to gruvbox", in: "", wantName: DefaultName},
+		{name: "empty defaults to claude-dark", in: "", wantName: DefaultName},
 		{name: "known theme", in: "nord", wantName: "nord"},
 		{name: "unknown theme falls back with warning", in: "not-a-theme", wantName: DefaultName, wantWarning: true},
 	}

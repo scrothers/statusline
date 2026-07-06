@@ -1,7 +1,7 @@
 # statusline
 
 <p align="center">
-  <img src="docs/img/hero.png" alt="statusline rendering a full Claude Code session in the gruvbox theme" width="850">
+  <img src="docs/img/hero.png" alt="statusline rendering a full Claude Code session in the claude-dark theme" width="850">
 </p>
 
 <p align="center">
@@ -16,7 +16,7 @@ command written in Go. Flat, no-background segments joined by a thin Nerd
 Font chevron divider, truecolor gradients, seven built-in themes, and an
 optional TOML config file for anyone who wants to tweak it further.
 
-*(The image above is a real render — `statusline demo --theme gruvbox --scenario full` —
+*(The image above is a real render — `statusline demo --theme claude-dark --scenario full` —
 captured as an image since GitHub can't render truecolor ANSI escape codes or
 Nerd Font glyphs inside a Markdown code block.)*
 
@@ -181,8 +181,8 @@ available.
 ## Themes
 
 Seven built-in themes, selected with `theme = "<name>"` in config or
-`--theme <name>` on the command line. `gruvbox` is the default. Themes are
-foreground-only palettes (identity accent + success/warning/danger/info/muted
+`--theme <name>` on the command line. `claude-dark` is the default. Themes
+are foreground-only palettes (identity accent + success/warning/danger/info/muted
 roles) — there's no background token, since the statusline never paints one.
 
 <p align="center">
@@ -191,13 +191,13 @@ roles) — there's no background token, since the statusline never paints one.
 
 | Name | Style |
 |---|---|
-| `gruvbox` | Warm, retro, high-contrast (default) |
+| `claude-dark` | Anthropic's coral/terracotta accent on a warm near-black ink background (default) |
+| `claude-light` | The same coral/terracotta accent on a warm cream background — the one built-in theme meant for a light terminal |
+| `gruvbox` | Warm, retro, high-contrast |
 | `catppuccin-mocha` | Soft pastel-on-dark |
 | `tokyo-night` | Cool blues/purples on near-black |
 | `nord` | Arctic blues |
 | `dracula` | High-contrast purple/pink |
-| `claude-dark` | Anthropic's coral/terracotta accent on a warm near-black ink background |
-| `claude-light` | The same coral/terracotta accent on a warm cream background — the one built-in theme meant for a light terminal |
 
 `claude-dark` and `claude-light` are built from Anthropic's published brand
 palette (the `#D97757` coral, `#141413` ink, `#FAF9F5` cream, plus a sage

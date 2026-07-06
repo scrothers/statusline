@@ -25,8 +25,8 @@ func TestLoad_noConfigAnywhereUsesDefaults(t *testing.T) {
 	if len(warnings) != 0 {
 		t.Errorf("Load() warnings = %v, want none", warnings)
 	}
-	if cfg.Theme != "gruvbox" {
-		t.Errorf("Theme = %q, want gruvbox", cfg.Theme)
+	if cfg.Theme != "claude-dark" {
+		t.Errorf("Theme = %q, want claude-dark", cfg.Theme)
 	}
 	if len(cfg.Lines) != 3 {
 		t.Errorf("len(Lines) = %d, want 3", len(cfg.Lines))
@@ -40,8 +40,8 @@ func TestLoad_explicitPathMissingWarnsAndFallsBack(t *testing.T) {
 	if len(warnings) != 1 {
 		t.Fatalf("Load() warnings = %v, want exactly 1", warnings)
 	}
-	if cfg.Theme != "gruvbox" {
-		t.Errorf("Theme = %q, want gruvbox (default)", cfg.Theme)
+	if cfg.Theme != "claude-dark" {
+		t.Errorf("Theme = %q, want claude-dark (default)", cfg.Theme)
 	}
 }
 
@@ -108,8 +108,8 @@ func TestLoad_explicitPathUnreadableWarnsAndFallsBack(t *testing.T) {
 	if len(warnings) != 1 {
 		t.Fatalf("Load() warnings = %v, want exactly 1", warnings)
 	}
-	if cfg.Theme != "gruvbox" {
-		t.Errorf("Theme = %q, want gruvbox (default)", cfg.Theme)
+	if cfg.Theme != "claude-dark" {
+		t.Errorf("Theme = %q, want claude-dark (default)", cfg.Theme)
 	}
 }
 
@@ -126,8 +126,8 @@ func TestLoad_malformedConfigWarnsAndFallsBack(t *testing.T) {
 	if len(warnings) != 1 {
 		t.Fatalf("Load() warnings = %v, want exactly 1", warnings)
 	}
-	if cfg.Theme != "gruvbox" {
-		t.Errorf("Theme = %q, want gruvbox (default)", cfg.Theme)
+	if cfg.Theme != "claude-dark" {
+		t.Errorf("Theme = %q, want claude-dark (default)", cfg.Theme)
 	}
 }
 
@@ -176,8 +176,8 @@ func TestLoad_claudeConfigDiscoveredWhenNoXDG(t *testing.T) {
 func TestDefault(t *testing.T) {
 	t.Parallel()
 	cfg := Default()
-	if cfg.Theme != "gruvbox" {
-		t.Errorf("Default().Theme = %q, want gruvbox", cfg.Theme)
+	if cfg.Theme != "claude-dark" {
+		t.Errorf("Default().Theme = %q, want claude-dark", cfg.Theme)
 	}
 	if !cfg.NerdFontEnabled() {
 		t.Error("Default().NerdFontEnabled() = false, want true")

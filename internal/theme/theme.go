@@ -16,13 +16,16 @@ import (
 var themeFS embed.FS
 
 // DefaultName is the theme used when none is configured, or when a
-// configured name doesn't match a built-in theme.
-const DefaultName = "gruvbox"
+// configured name doesn't match a built-in theme. claude-dark is a
+// reasonable default for the widest audience with zero config: most
+// terminals are dark, and it doesn't assume familiarity with any specific
+// developer color scheme the way gruvbox/nord/dracula/etc. do.
+const DefaultName = "claude-dark"
 
 // names is the built-in theme list in a fixed display order (matching the
 // README's theme table), since a map (as LoadRegistry returns) has no
-// stable iteration order.
-var names = []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula", "claude-dark", "claude-light"}
+// stable iteration order. DefaultName is listed first.
+var names = []string{"claude-dark", "claude-light", "gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"}
 
 // Names returns the built-in theme names in a fixed, stable display order.
 func Names() []string {

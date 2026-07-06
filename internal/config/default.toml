@@ -1,4 +1,4 @@
-theme = "gruvbox"
+theme = "claude-dark"
 nerd_font = true
 
 [[lines]]
