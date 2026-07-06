@@ -1,6 +1,8 @@
 package demo
 
 import (
+	"time"
+
 	"github.com/scrothers/statusline/internal/gitstatus"
 	"github.com/scrothers/statusline/internal/input"
 )
@@ -90,8 +92,8 @@ func fullScenario() Scenario {
 				},
 			},
 			RateLimits: &input.RateLimits{
-				FiveHour: &input.RateLimitWindow{UsedPercentage: 42},
-				SevenDay: &input.RateLimitWindow{UsedPercentage: 71},
+				FiveHour: &input.RateLimitWindow{UsedPercentage: 42, ResetsAt: time.Now().Add(2*time.Hour + 34*time.Minute).Unix()},
+				SevenDay: &input.RateLimitWindow{UsedPercentage: 71, ResetsAt: time.Now().Add(3*24*time.Hour + 2*time.Hour).Unix()},
 			},
 			Thinking: &input.Thinking{Enabled: true},
 			Effort:   &input.Effort{Level: "high"},

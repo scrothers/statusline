@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -76,6 +77,7 @@ func runDemo(themeName, scenarioName string, columns int) error {
 			Theme:   &th,
 			Columns: scenario.Columns,
 			Git:     scenario.Git,
+			Now:     time.Now(),
 		}
 		fmt.Println(render.Render(rc, reg))
 		if len(names) > 1 && i < len(names)-1 {

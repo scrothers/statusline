@@ -47,6 +47,7 @@ const (
 	IconTokensInput       = "tokens_input"
 	IconTokensOutput      = "tokens_output"
 	IconTokensCacheCreate = "tokens_cache_create"
+	IconRateLimitReset    = "ratelimit_reset"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -109,6 +110,7 @@ var Icons = map[string]Icon{
 	IconTokensInput:       {Glyph: "\U000F0120", Fallback: "in"},        // nf-md-tray_arrow_down
 	IconTokensOutput:      {Glyph: "\U000F011D", Fallback: "out"},       // nf-md-tray_arrow_up
 	IconTokensCacheCreate: {Glyph: "\U000F01BA", Fallback: "c+"},        // nf-md-database_plus
+	IconRateLimitReset:    {Glyph: "\uEAD2", Fallback: "resets:"},       // nf-cod-debug_restart
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,

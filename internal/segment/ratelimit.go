@@ -2,6 +2,7 @@ package segment
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/scrothers/statusline/internal/input"
 	"github.com/scrothers/statusline/internal/style"
@@ -26,9 +27,11 @@ const (
 // to match the context-window gauge: an icon, an explicit window label
 // ("5h"/"7d") so the two gauges aren't distinguishable by icon alone, a
 // bracketed bar whose filled cells follow the same fixed green-to-red
-// position gradient, and the percentage. FiveHour and SevenDay are
-// registered as separate Segment instances (ratelimit_5h / ratelimit_7d)
-// since either window may be independently absent from the payload.
+// position gradient, the percentage, and (when the payload reports a reset
+// time) a human-friendly countdown to when the window resets. FiveHour and
+// SevenDay are registered as separate Segment instances (ratelimit_5h /
+// ratelimit_7d) since either window may be independently absent from the
+// payload.
 type rateLimitSegment struct {
 	window rateLimitWindow
 }
@@ -70,7 +73,7 @@ func (s rateLimitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	filled, track := style.BlockBarParts(win.UsedPercentage, rateLimitGaugeWidth)
 	icon := theme.Glyph(iconKey, rc.Config.NerdFontEnabled())
 
-	chunks := make([]style.Chunk, 0, rateLimitGaugeWidth+5)
+	chunks := make([]style.Chunk, 0, rateLimitGaugeWidth+6)
 	chunks = append(chunks,
 		style.Chunk{Text: icon + " " + label, FG: color},
 		style.Chunk{Text: " ⟨", FG: rc.Theme.Muted},
@@ -81,5 +84,41 @@ func (s rateLimitSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 		style.Chunk{Text: "⟩", FG: rc.Theme.Muted},
 		style.Chunk{Text: fmt.Sprintf(" %.0f%%", win.UsedPercentage), FG: color},
 	)
+	if win.ResetsAt > 0 {
+		resetIcon := theme.Glyph(theme.IconRateLimitReset, rc.Config.NerdFontEnabled())
+		remaining := time.Unix(win.ResetsAt, 0).Sub(rc.Now)
+		chunks = append(chunks, style.Chunk{
+			Text: " " + resetIcon + " " + formatResetIn(remaining),
+			FG:   rc.Theme.Muted,
+		})
+	}
 	return chunks, true
+}
+
+// formatResetIn renders a duration until a rate-limit window resets as a
+// compact, human-friendly string, showing at most two significant units
+// (e.g. "5h", "3d 2h", "42m") rather than exact minutes-and-seconds
+// precision, since this is a coarse "comes back around then" indicator, not
+// a countdown clock. A non-positive duration (the reset time has already
+// passed, e.g. stale payload data) renders as "now".
+func formatResetIn(d time.Duration) string {
+	if d <= 0 {
+		return "now"
+	}
+	d = d.Round(time.Minute)
+	days := int(d / (24 * time.Hour))
+	hours := int(d % (24 * time.Hour) / time.Hour)
+	minutes := int(d % time.Hour / time.Minute)
+
+	switch {
+	case days > 0:
+		if hours > 0 {
+			return fmt.Sprintf("%dd %dh", days, hours)
+		}
+		return fmt.Sprintf("%dd", days)
+	case hours > 0:
+		return fmt.Sprintf("%dh", hours)
+	default:
+		return fmt.Sprintf("%dm", minutes)
+	}
 }
