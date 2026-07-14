@@ -15,9 +15,18 @@ var familyNames = map[string]string{
 }
 
 var (
+	// reSeparators normalizes underscores and whitespace — used by some
+	// gateways and env-derived IDs instead of dashes — to the dash-delimited
+	// scheme every other source uses.
+	reSeparators = regexp.MustCompile(`[\s_]+`)
+
 	// reVTag strips a Bedrock inference-profile version tag, e.g. the "-v2"
 	// in "claude-3-5-sonnet-20241022-v2".
-	reVTag = regexp.MustCompile(`-v\d+$`)
+	reVTag = regexp.MustCompile(`(?i)-v\d+$`)
+
+	// reAnthropicPrefix strips a Bedrock region + provider prefix, e.g.
+	// "us.anthropic." or "anthropic.", however it's cased.
+	reAnthropicPrefix = regexp.MustCompile(`(?i)anthropic\.`)
 
 	// re1M strips a "[1m]" 1M-context marker, however it's cased.
 	re1M = regexp.MustCompile(`(?i)\[1m\]`)
@@ -27,7 +36,25 @@ var (
 
 	// reVersionToken matches a 1-2 digit version component, e.g. "4" or "8".
 	reVersionToken = regexp.MustCompile(`^\d{1,2}$`)
+
+	// reAllDigits matches a numeric token that's neither a date stamp nor a
+	// version component (e.g. a stray build number) — dropped rather than
+	// guessed at.
+	reAllDigits = regexp.MustCompile(`^\d+$`)
 )
+
+// fillerWords are tokens that describe a release channel or context variant
+// rather than a family or version — dropped so they never get mistaken for
+// an unrecognized family name (see the otherFamily fallback below).
+var fillerWords = map[string]bool{
+	"latest":       true,
+	"stable":       true,
+	"preview":      true,
+	"beta":         true,
+	"alpha":        true,
+	"experimental": true,
+	"1m":           true,
+}
 
 // Label returns the best available display label for a model: a decoded,
 // normalized "<Family> <Version>" form of id when id is recognizably a
@@ -50,15 +77,22 @@ func Decode(id string) (label string, ok bool) {
 		return "", false
 	}
 
-	// Strip an OpenRouter-style "provider/" prefix.
+	// Some gateways (and env-derived IDs) use underscores or literal
+	// whitespace instead of dashes.
+	s = reSeparators.ReplaceAllString(s, "-")
+
+	// Strip an OpenRouter-style "provider/" prefix, or a full Vertex
+	// resource path ("projects/.../publishers/anthropic/models/claude-...").
 	if i := strings.LastIndex(s, "/"); i >= 0 {
 		s = s[i+1:]
 	}
 
 	// Strip a Bedrock region + provider prefix: "us.anthropic." or
-	// "anthropic." both collapse to nothing.
-	if i := strings.Index(s, "anthropic."); i >= 0 {
-		s = s[i+len("anthropic."):]
+	// "anthropic." both collapse to nothing. This also covers a full
+	// Bedrock ARN ("arn:aws:bedrock:...:foundation-model/anthropic.claude-...")
+	// once the slash-prefix strip above has dropped everything before it.
+	if loc := reAnthropicPrefix.FindStringIndex(s); loc != nil {
+		s = s[loc[1]:]
 	}
 
 	// Strip an OpenRouter variant tag, e.g. "claude-3.5-sonnet:beta".
@@ -99,6 +133,11 @@ func Decode(id string) (label string, ok bool) {
 			// Snapshot date stamp — not part of the displayed version.
 		case reVersionToken.MatchString(tok):
 			versionParts = append(versionParts, tok)
+		case fillerWords[lower]:
+			// Release-channel adjective or context marker — not a family.
+		case reAllDigits.MatchString(tok):
+			// Some other numeric tag (e.g. a build number) — not a version
+			// or a family; safer to drop than to guess.
 		case otherFamily == "":
 			otherFamily = strings.ToUpper(lower[:1]) + lower[1:]
 		}
@@ -113,6 +152,12 @@ func Decode(id string) (label string, ok bool) {
 		} else {
 			family = "Claude"
 		}
+	}
+
+	// A trailing zero version component is a legacy alias artifact
+	// ("claude-opus-4-0" is "Claude Opus 4", not "Claude Opus 4.0").
+	for len(versionParts) > 1 && versionParts[len(versionParts)-1] == "0" {
+		versionParts = versionParts[:len(versionParts)-1]
 	}
 
 	label = family
