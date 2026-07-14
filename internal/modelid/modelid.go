@@ -72,9 +72,33 @@ func Label(id, displayName string) string {
 // It reports ok=false when id doesn't look like a Claude model at all, so
 // callers can fall back to another source.
 func Decode(id string) (label string, ok bool) {
+	family, versionParts, ok := decode(id)
+	if !ok {
+		return "", false
+	}
+	label = family
+	if len(versionParts) > 0 {
+		label += " " + strings.Join(versionParts, ".")
+	}
+	return label, true
+}
+
+// Family returns just the canonical family name decoded from id (e.g.
+// "Opus", "Sonnet", or the "Claude" fallback for a recognizably-Claude id
+// with no known family word), without the version. It reports ok=false
+// under the same conditions as Decode.
+func Family(id string) (family string, ok bool) {
+	family, _, ok = decode(id)
+	return family, ok
+}
+
+// decode is the shared implementation behind Decode and Family: it unwraps
+// known provider framing and tokenizes id into a family word and ordered
+// version components.
+func decode(id string) (family string, versionParts []string, ok bool) {
 	s := strings.TrimSpace(id)
 	if s == "" {
-		return "", false
+		return "", nil, false
 	}
 
 	// Some gateways (and env-derived IDs) use underscores or literal
@@ -115,8 +139,7 @@ func Decode(id string) (label string, ok bool) {
 	// dash-delimited scheme every other source uses.
 	s = strings.ReplaceAll(s, ".", "-")
 
-	var family, otherFamily string
-	var versionParts []string
+	var otherFamily string
 	sawClaude := false
 
 	for tok := range strings.SplitSeq(s, "-") {
@@ -145,7 +168,7 @@ func Decode(id string) (label string, ok bool) {
 
 	if family == "" {
 		if !sawClaude {
-			return "", false
+			return "", nil, false
 		}
 		if otherFamily != "" {
 			family = otherFamily
@@ -160,9 +183,5 @@ func Decode(id string) (label string, ok bool) {
 		versionParts = versionParts[:len(versionParts)-1]
 	}
 
-	label = family
-	if len(versionParts) > 0 {
-		label += " " + strings.Join(versionParts, ".")
-	}
-	return label, true
+	return family, versionParts, true
 }

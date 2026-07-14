@@ -31,6 +31,10 @@ func TestLoadRegistry(t *testing.T) {
 		if !th.Success.Valid || !th.Warning.Valid || !th.Danger.Valid || !th.Info.Valid || !th.Muted.Valid {
 			t.Errorf("registry[%q] has an unparsed semantic color: %+v", name, th)
 		}
+		if !th.IdentityOpus.Valid || !th.IdentitySonnet.Valid || !th.IdentityHaiku.Valid ||
+			!th.IdentityFable.Valid || !th.IdentityMythos.Valid {
+			t.Errorf("registry[%q] has an unparsed per-family identity color: %+v", name, th)
+		}
 	}
 }
 
@@ -40,6 +44,11 @@ func TestRawThemeResolve(t *testing.T) {
 	validColors := func() (c struct {
 		IdentityAccent string `toml:"identity_accent"`
 		IdentityText   string `toml:"identity_text"`
+		IdentityOpus   string `toml:"identity_opus"`
+		IdentitySonnet string `toml:"identity_sonnet"`
+		IdentityHaiku  string `toml:"identity_haiku"`
+		IdentityFable  string `toml:"identity_fable"`
+		IdentityMythos string `toml:"identity_mythos"`
 		TextPrimary    string `toml:"text_primary"`
 		TextSecondary  string `toml:"text_secondary"`
 		Success        string `toml:"success"`
@@ -51,6 +60,9 @@ func TestRawThemeResolve(t *testing.T) {
 	}) {
 		hex := "#112233"
 		c.IdentityAccent, c.IdentityText = hex, hex
+		c.IdentityOpus, c.IdentitySonnet = hex, hex
+		c.IdentityHaiku, c.IdentityFable = hex, hex
+		c.IdentityMythos = hex
 		c.TextPrimary, c.TextSecondary = hex, hex
 		c.Success, c.Warning, c.Danger = hex, hex, hex
 		c.Info, c.Muted, c.TrackDim = hex, hex, hex
@@ -194,6 +206,55 @@ func TestThemeWithOverrides(t *testing.T) {
 		}
 		if got != base {
 			t.Errorf("WithOverrides(nil) = %+v, want unchanged %+v", got, base)
+		}
+	})
+}
+
+func TestIdentityColorFor(t *testing.T) {
+	t.Parallel()
+
+	registry, err := LoadRegistry()
+	if err != nil {
+		t.Fatalf("LoadRegistry() error = %v", err)
+	}
+	th := registry[DefaultName]
+
+	tests := []struct {
+		family string
+		want   style.Color
+	}{
+		{"Opus", th.IdentityOpus},
+		{"Sonnet", th.IdentitySonnet},
+		{"Haiku", th.IdentityHaiku},
+		{"Fable", th.IdentityFable},
+		{"Mythos", th.IdentityMythos},
+		{"Claude", th.IdentityAccent}, // the modelid.Family fallback value
+		{"", th.IdentityAccent},       // no family decoded at all
+		{"Atlas", th.IdentityAccent},  // an unrecognized future family word
+	}
+	for _, tt := range tests {
+		t.Run(tt.family, func(t *testing.T) {
+			t.Parallel()
+			if got := th.IdentityColorFor(tt.family); got != tt.want {
+				t.Errorf("IdentityColorFor(%q) = %+v, want %+v", tt.family, got, tt.want)
+			}
+		})
+	}
+
+	t.Run("each known family is a distinct color", func(t *testing.T) {
+		t.Parallel()
+		colors := map[string]style.Color{
+			"Sonnet": th.IdentitySonnet,
+			"Haiku":  th.IdentityHaiku,
+			"Fable":  th.IdentityFable,
+			"Mythos": th.IdentityMythos,
+		}
+		seen := map[style.Color]string{}
+		for family, c := range colors {
+			if other, dup := seen[c]; dup {
+				t.Errorf("%s and %s share the same color %+v in %s", family, other, c, DefaultName)
+			}
+			seen[c] = family
 		}
 	})
 }

@@ -48,6 +48,10 @@ const (
 	IconTokensOutput      = "tokens_output"
 	IconTokensCacheCreate = "tokens_cache_create" // #nosec G101 -- an icon key constant, not a credential; gosec's heuristic matches "token" in the name
 	IconRateLimitReset    = "ratelimit_reset"
+	IconProviderAWS       = "provider_aws"
+	IconProviderGCP       = "provider_gcp"
+	IconProviderAzure     = "provider_azure"
+	IconProviderRouter    = "provider_router"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -111,6 +115,10 @@ var Icons = map[string]Icon{
 	IconTokensOutput:      {Glyph: "\U000F011D", Fallback: "out"},       // nf-md-tray_arrow_up
 	IconTokensCacheCreate: {Glyph: "\U000F01BA", Fallback: "c+"},        // nf-md-database_plus
 	IconRateLimitReset:    {Glyph: "\uEAD2", Fallback: "resets:"},       // nf-cod-debug_restart
+	IconProviderAWS:       {Glyph: "\U000F0E0F", Fallback: "AWS"},       // nf-md-aws
+	IconProviderGCP:       {Glyph: "\U000F11F6", Fallback: "GCP"},       // nf-md-google_cloud
+	IconProviderAzure:     {Glyph: "\U000F0805", Fallback: "Azure"},     // nf-md-microsoft_azure
+	IconProviderRouter:    {Glyph: "\U000F11E2", Fallback: "Router"},    // nf-md-router
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,

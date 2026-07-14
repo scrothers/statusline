@@ -82,6 +82,42 @@ func TestDecode(t *testing.T) {
 	}
 }
 
+func TestFamily(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name       string
+		id         string
+		wantFamily string
+		wantOK     bool
+	}{
+		{"opus", "claude-opus-4-8", "Opus", true},
+		{"gateway reordered opus", "claude-4-8-opus", "Opus", true},
+		{"sonnet", "claude-sonnet-4-6", "Sonnet", true},
+		{"haiku", "claude-haiku-4-5", "Haiku", true},
+		{"fable", "claude-fable-5", "Fable", true},
+		{"mythos", "claude-mythos-5", "Mythos", true},
+		{"legacy dotted no family word falls back to claude", "claude-2.1", "Claude", true},
+		{"unknown future family word", "claude-atlas-6", "Atlas", true},
+		{"bedrock wrapped sonnet", "anthropic.claude-3-5-sonnet-20241022", "Sonnet", true},
+		{"empty id", "", "", false},
+		{"non-claude id", "gpt-4-turbo", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			gotFamily, gotOK := Family(tt.id)
+			if gotOK != tt.wantOK {
+				t.Fatalf("Family(%q) ok = %v, want %v", tt.id, gotOK, tt.wantOK)
+			}
+			if gotFamily != tt.wantFamily {
+				t.Errorf("Family(%q) = %q, want %q", tt.id, gotFamily, tt.wantFamily)
+			}
+		})
+	}
+}
+
 func TestLabel(t *testing.T) {
 	t.Parallel()
 

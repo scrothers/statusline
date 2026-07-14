@@ -7,8 +7,9 @@ import (
 )
 
 // modelSegment renders the current model's display name. It's an identity
-// fact, not a state, so it always uses the theme's identity accent rather
-// than a semantic success/warning/danger color.
+// fact, not a state, so its icon uses a per-model-family identity accent
+// (Theme.IdentityColorFor) rather than a semantic success/warning/danger
+// color — the label text itself stays a neutral, theme-consistent color.
 type modelSegment struct{}
 
 func (modelSegment) ID() string { return "model" }
@@ -25,9 +26,10 @@ func (modelSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
 	if label == "" {
 		return nil, false
 	}
+	family, _ := modelid.Family(rc.Payload.Model.ID)
 	icon := theme.Glyph(theme.IconModel, rc.Config.NerdFontEnabled())
 	return []style.Chunk{
-		{Text: icon, FG: rc.Theme.IdentityAccent},
+		{Text: icon, FG: rc.Theme.IdentityColorFor(family)},
 		{Text: " " + label, FG: rc.Theme.IdentityText},
 	}, true
 }

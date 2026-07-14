@@ -52,7 +52,7 @@ func TestRegistry(t *testing.T) {
 
 	reg := Registry()
 	wantIDs := []string{
-		"model", "directory", "git", "context_window", "cost", "duration",
+		"model", "provider", "directory", "git", "context_window", "cost", "duration",
 		"ratelimit_5h", "ratelimit_7d", "pr", "vim", "agent", "effort", "output_style",
 		"thinking", "cache", "session_name", "lines_changed", "token_counts", "repo", "worktree",
 	}
@@ -81,6 +81,7 @@ func TestSegmentPriorities(t *testing.T) {
 
 	want := map[string]int{
 		"model":          100,
+		"provider":       15,
 		"directory":      100,
 		"git":            90,
 		"context_window": 90,

@@ -3,7 +3,7 @@ nerd_font = true
 
 [[lines]]
 enabled = true
-segments = ["model", "thinking", "effort", "context_window", "ratelimit_5h", "ratelimit_7d", "cache"]
+segments = ["model", "provider", "thinking", "effort", "context_window", "ratelimit_5h", "ratelimit_7d", "cache"]
 
 [[lines]]
 enabled = true

@@ -10,6 +10,13 @@ type Config struct {
 	Segments       map[string]SegmentConfig `toml:"segments"`
 	Git            GitConfig                `toml:"git"`
 	Budget         BudgetConfig             `toml:"budget"`
+	// Provider forces the provider badge segment to a specific gateway
+	// ("aws", "gcp", "azure", or "router") instead of auto-detecting from
+	// the model id. This is the only way the Azure badge can ever appear —
+	// Microsoft Foundry (and especially Azure AI Foundry deployment names)
+	// carries no reliable id-shape signal to detect automatically. An
+	// unrecognized value is treated the same as unset (auto-detect).
+	Provider string `toml:"provider"`
 }
 
 // NerdFontEnabled reports whether Nerd Font glyphs should render, defaulting

@@ -89,6 +89,24 @@ func TestE2E_gatewayModelIDDecodesOverDisplayName(t *testing.T) {
 	}
 }
 
+func TestE2E_providerBadgeFallbackText(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	payload := `{"model":{"id":"anthropic.claude-opus-4-8","display_name":"anthropic.claude-opus-4-8"},` +
+		`"cwd":"/tmp","session_id":"s7"}`
+	out, code := run(t, payload, nil, "--config", configPath)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "AWS") {
+		t.Errorf("output = %q, want it to contain the AWS provider badge fallback", out)
+	}
+}
+
 func TestE2E_version(t *testing.T) {
 	out, code := run(t, "", nil, "--version")
 	if code != 0 {
