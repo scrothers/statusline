@@ -6,31 +6,38 @@ import "strings"
 // through.
 type Provider string
 
-// Recognized providers. ProviderAzure and ProviderGateway exist so they can
-// be named in a config override or detected from environment — see the
-// ParseProvider docs — but are never returned by DetectProvider itself:
-// neither Microsoft Foundry model ids (nor, especially, Azure AI Foundry
-// deployment names) nor a bare id relayed unchanged by a corporate/self-hosted
-// proxy carry any distinguishing shape; either can be indistinguishable from
-// a first-party id. Both are still detectable, just not from the id — see
+// Recognized providers. ProviderAzure, ProviderCloudflare, ProviderDigitalOcean,
+// and ProviderGateway exist so they can be named in a config override or
+// detected from environment — see the ParseProvider docs — but are never
+// returned by DetectProvider itself: none of Microsoft Foundry model ids
+// (nor, especially, Azure AI Foundry deployment names), Cloudflare AI
+// Gateway, DigitalOcean's inference endpoint, or a bare id relayed unchanged
+// by some other corporate/self-hosted proxy carry any distinguishing shape
+// in the id — any of them can be indistinguishable from a first-party id.
+// All four are still detectable, just not from the id — see
 // config.DetectProviderFromEnv, which inspects Claude Code's own routing
-// environment variables instead.
+// environment variables (including the destination host of
+// ANTHROPIC_BASE_URL) instead.
 const (
-	ProviderAWS     Provider = "aws"
-	ProviderGCP     Provider = "gcp"
-	ProviderAzure   Provider = "azure"
-	ProviderRouter  Provider = "router"
-	ProviderGateway Provider = "gateway"
+	ProviderAWS          Provider = "aws"
+	ProviderGCP          Provider = "gcp"
+	ProviderAzure        Provider = "azure"
+	ProviderRouter       Provider = "router"
+	ProviderGateway      Provider = "gateway"
+	ProviderCloudflare   Provider = "cloudflare"
+	ProviderDigitalOcean Provider = "digitalocean"
 )
 
 // providerNames maps a config-facing provider name to its Provider value,
 // used by ParseProvider.
 var providerNames = map[string]Provider{
-	string(ProviderAWS):     ProviderAWS,
-	string(ProviderGCP):     ProviderGCP,
-	string(ProviderAzure):   ProviderAzure,
-	string(ProviderRouter):  ProviderRouter,
-	string(ProviderGateway): ProviderGateway,
+	string(ProviderAWS):          ProviderAWS,
+	string(ProviderGCP):          ProviderGCP,
+	string(ProviderAzure):        ProviderAzure,
+	string(ProviderRouter):       ProviderRouter,
+	string(ProviderGateway):      ProviderGateway,
+	string(ProviderCloudflare):   ProviderCloudflare,
+	string(ProviderDigitalOcean): ProviderDigitalOcean,
 }
 
 // ParseProvider validates a user-supplied provider override string (e.g.

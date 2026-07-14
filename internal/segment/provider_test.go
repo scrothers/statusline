@@ -96,6 +96,36 @@ func TestProviderSegment(t *testing.T) {
 		}
 	})
 
+	t.Run("config override forces the cloudflare badge on an otherwise-plain id", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Model: &input.Model{ID: "claude-opus-4-8"}}, nil)
+		disableNerdFont(rc)
+		rc.Config.Provider = "cloudflare"
+
+		chunks, ok := providerSegment{}.Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true with a provider override set")
+		}
+		if !strings.Contains(chunkText(chunks), "Cloudflare") {
+			t.Errorf("rendered text = %q, want it to contain the Cloudflare fallback", chunkText(chunks))
+		}
+	})
+
+	t.Run("config override forces the digitalocean badge on an otherwise-plain id", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Model: &input.Model{ID: "claude-opus-4-8"}}, nil)
+		disableNerdFont(rc)
+		rc.Config.Provider = "digitalocean"
+
+		chunks, ok := providerSegment{}.Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true with a provider override set")
+		}
+		if !strings.Contains(chunkText(chunks), "DO") {
+			t.Errorf("rendered text = %q, want it to contain the DigitalOcean fallback", chunkText(chunks))
+		}
+	})
+
 	t.Run("config override forces the azure badge on an otherwise-plain id", func(t *testing.T) {
 		t.Parallel()
 		rc := newTestContext(t, &input.Payload{Model: &input.Model{ID: "claude-opus-4-8"}}, nil)
