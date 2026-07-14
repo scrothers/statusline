@@ -98,7 +98,7 @@ joined by a thin chevron divider, not powerline pills.
 
 | Line | Segments | Notes |
 |---|---|---|
-| 1 — Claude | model, thinking, effort, context window, rate limits (5h/7d), cache | The model's own state: what it's running, how hard, and how much room/budget is left. |
+| 1 — Claude | model, provider badge, thinking, effort, context window, rate limits (5h/7d), cache | The model's own state: what it's running, how hard, and how much room/budget is left. |
 | 2 — session | session name, directory, lines added/removed, token counts, cost, duration | Omitted fields (no custom name, no diff yet) just don't appear. |
 | 3 — git | repo (host/owner/name), open PR (number + review state), branch + status, worktree | The whole line disappears outside a git repository. |
 
@@ -108,6 +108,20 @@ no background either — they just aren't wired into any line by default.
 
 Under width pressure, segments drop in priority order (lowest first) until
 a line fits; model and directory never drop, only self-truncate.
+
+`model`'s icon is colored per model family — Opus, Sonnet, Haiku, Fable, and
+Mythos each get their own theme-defined accent (see [Themes](#themes))
+instead of one flat color, so the tier you're running is visible at a
+glance; an id that doesn't decode to one of those five falls back to the
+theme's general identity accent. `provider` renders a small badge next to
+`model` (AWS/GCP/Azure/Router icon) when the `model.id` shape reveals which
+gateway it was routed through — a Bedrock `anthropic.` prefix or ARN, a
+Vertex `@date` suffix or resource path, or a `vendor/model` prefix from an
+OpenRouter-style aggregator. It's silent for a plain first-party id, and it
+can't detect Microsoft Foundry/Azure at all — Azure deployment names carry
+no distinguishing shape, so that badge only ever appears via an explicit
+`provider = "azure"` in config (also accepts `"aws"`/`"gcp"`/`"router"` to
+force any badge over auto-detection).
 
 `effort` is the one segment colored by intensity rather than theme: its icon
 escalates from an empty gauge (`low`) through a full gauge (`xhigh`) to fire
@@ -185,8 +199,12 @@ available.
 
 Seven built-in themes, selected with `theme = "<name>"` in config or
 `--theme <name>` on the command line. `claude-dark` is the default. Themes
-are foreground-only palettes (identity accent + success/warning/danger/info/muted
-roles) — there's no background token, since the statusline never paints one.
+are foreground-only palettes (identity accent + per-model-family identity
+accents (`identity_opus`/`identity_sonnet`/`identity_haiku`/`identity_fable`/
+`identity_mythos`) + success/warning/danger/info/muted roles) — there's no
+background token, since the statusline never paints one. Every color token,
+including the per-family ones, can be overridden individually via
+`[theme_overrides]` (see [Configuration](#configuration)).
 
 <p align="center">
   <img src="docs/img/themes.png" alt="All seven built-in themes rendering the same full session" width="850">
