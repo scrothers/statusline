@@ -100,9 +100,9 @@ func TestDetectProviderFromEnv_baseURL(t *testing.T) {
 		{"default host different scheme case", "HTTPS://API.ANTHROPIC.COM", "", false},
 
 		{"cloudflare ai gateway", "https://gateway.ai.cloudflare.com/v1/acct/gw/anthropic", "cloudflare", true},
-		{"cloudflare bare host", "https://cloudflare.com", "cloudflare", true},
 		{"cloudflare mixed case", "https://Gateway.AI.Cloudflare.COM/v1", "cloudflare", true},
 		{"cloudflare with port", "https://gateway.ai.cloudflare.com:443/v1", "cloudflare", true},
+		{"cloudflare subdomain of the gateway host", "https://acct123.gateway.ai.cloudflare.com/v1", "cloudflare", true},
 
 		{"digitalocean inference endpoint", "https://inference.do-ai.run", "digitalocean", true},
 		{"digitalocean app platform", "https://my-litellm-proxy.ondigitalocean.app", "digitalocean", true},
@@ -113,11 +113,17 @@ func TestDetectProviderFromEnv_baseURL(t *testing.T) {
 		{"generic proxy with port and path", "https://10.0.0.5:8443/anthropic-proxy", "gateway", true},
 
 		// Adversarial/false-positive guards: a naive substring match on the
-		// raw string would wrongly classify all three of these.
+		// raw string would wrongly classify all of these.
 		{"lookalike domain is not cloudflare", "https://notcloudflare.com", "gateway", true},
 		{"cloudflare as a path segment is not cloudflare", "https://mycorp.com/cloudflare-proxy", "gateway", true},
 		{"cloudflare as a subdomain of an unrelated domain is not cloudflare", "https://cloudflare.com.evil.example", "gateway", true},
 		{"do-ai.run as a path segment is not digitalocean", "https://mycorp.com/do-ai.run", "gateway", true},
+		// The Cloudflare apex domain hosts many unrelated products (API,
+		// dashboard, ...) beyond AI Gateway — only the specific gateway
+		// host counts, matching the narrowest verified product host rather
+		// than the whole company domain.
+		{"bare cloudflare.com apex is not specifically the ai gateway", "https://cloudflare.com", "gateway", true},
+		{"other cloudflare product is not the ai gateway", "https://api.cloudflare.com/client/v4", "gateway", true},
 		{"api.anthropic.com in the path is not the default host", "https://evil.example/api.anthropic.com", "gateway", true},
 		{"api.anthropic.com as a subdomain of an attacker domain is not the default host", "https://api.anthropic.com.evil.example", "gateway", true},
 

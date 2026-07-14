@@ -11,11 +11,16 @@ type Config struct {
 	Git            GitConfig                `toml:"git"`
 	Budget         BudgetConfig             `toml:"budget"`
 	// Provider forces the provider badge segment to a specific gateway
-	// ("aws", "gcp", "azure", or "router") instead of auto-detecting from
-	// the model id. This is the only way the Azure badge can ever appear —
-	// Microsoft Foundry (and especially Azure AI Foundry deployment names)
-	// carries no reliable id-shape signal to detect automatically. An
-	// unrecognized value is treated the same as unset (auto-detect).
+	// ("aws", "gcp", "azure", "cloudflare", "digitalocean", "router", or
+	// "gateway") instead of auto-detecting. Auto-detection itself has two
+	// tiers: Claude Code's own routing environment variables (see
+	// DetectProviderFromEnv) are checked first — the only reliable way to
+	// detect Azure/Foundry, Cloudflare, DigitalOcean, or a bare
+	// corporate-relayed id, since none of them carry any distinguishing
+	// shape in the model id — then the model id's own shape as a last
+	// resort. This field is a manual override on top of both, not the only
+	// way any particular badge can appear. An unrecognized value is treated
+	// the same as unset (fall through to auto-detection).
 	Provider string `toml:"provider"`
 }
 

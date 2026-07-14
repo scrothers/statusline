@@ -49,15 +49,18 @@ const defaultAnthropicHost = "api.anthropic.com"
 //   - DigitalOcean Gradient AI: inference.do-ai.run, or any app hosted on
 //     DigitalOcean's App Platform (*.ondigitalocean.app) proxying it
 //
-// Suffixes, not exact hosts, so a subdomain still matches (e.g. a
-// per-account gateway.ai.cloudflare.com path segment doesn't change the
-// host, but a future product variant on a subdomain would still resolve
-// correctly here).
+// Deliberately narrow to the actual product host, not the bare apex domain
+// (e.g. "gateway.ai.cloudflare.com", not "cloudflare.com") — Cloudflare and
+// DigitalOcean both host many products unrelated to LLM gateways on their
+// apex domain (api.cloudflare.com, dash.cloudflare.com, ...), and matching
+// the whole domain would badge those as the wrong product. Still a suffix
+// match, so per-account path/subdomain variants of the same product still
+// resolve correctly.
 var gatewayHosts = []struct {
 	provider string
 	suffixes []string
 }{
-	{"cloudflare", []string{"cloudflare.com"}},
+	{"cloudflare", []string{"gateway.ai.cloudflare.com"}},
 	{"digitalocean", []string{"do-ai.run", "ondigitalocean.app"}},
 }
 
