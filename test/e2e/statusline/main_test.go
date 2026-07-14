@@ -107,6 +107,26 @@ func TestE2E_providerBadgeFallbackText(t *testing.T) {
 	}
 }
 
+func TestE2E_providerBadgeDetectedFromEnv(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	// A bare first-party-shaped id has no provider signal of its own — the
+	// gateway badge can only come from the env var, proving the detection
+	// actually wires through a real subprocess invocation end-to-end.
+	payload := `{"model":{"id":"claude-opus-4-8"},"cwd":"/tmp","session_id":"s8"}`
+	out, code := run(t, payload, []string{"ANTHROPIC_BASE_URL=https://llm-proxy.internal.example.com"}, "--config", configPath)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "Gateway") {
+		t.Errorf("output = %q, want it to contain the Gateway provider badge fallback", out)
+	}
+}
+
 func TestE2E_version(t *testing.T) {
 	out, code := run(t, "", nil, "--version")
 	if code != 0 {

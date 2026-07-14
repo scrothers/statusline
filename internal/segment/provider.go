@@ -7,18 +7,23 @@ import (
 )
 
 // providerSegment renders a small badge for the gateway a model id was
-// routed through: AWS Bedrock, Google Vertex, Microsoft Foundry/Azure, or a
-// generic third-party router (OpenRouter and similar). Only the glyph
-// varies by provider — the color stays the theme's flat IdentityAccent,
-// matching how repoSegment colors its host-branded icon — so this reads as
-// a small supplementary badge, not a second accent system competing with
-// the model segment's per-family colors.
+// routed through: AWS Bedrock, Google Vertex, Microsoft Foundry/Azure, a
+// generic third-party router (OpenRouter and similar), or a corporate/
+// self-hosted gateway. Only the glyph varies by provider — the color stays
+// the theme's flat IdentityAccent, matching how repoSegment colors its
+// host-branded icon — so this reads as a small supplementary badge, not a
+// second accent system competing with the model segment's per-family
+// colors.
 //
-// A plain first-party-shaped id has no detectable provider shape, so the
-// segment is omitted in the common case. Microsoft Foundry in particular
-// (and especially Azure AI Foundry deployment names) can't be detected from
-// id alone — it can look identical to a first-party id — so the only way
-// that badge ever appears is the config.Provider override.
+// rc.Config.Provider is the single source of truth here: it's either an
+// explicit user override (config.toml `provider = "..."`) or, more often,
+// already populated by config.DetectProviderFromEnv at startup from Claude
+// Code's own routing environment variables — the only reliable way to badge
+// Azure/Foundry or a bare corporate-relayed id, neither of which carries any
+// distinguishing shape in the id itself. modelid.DetectProvider (id-shape
+// heuristics) is only the last-resort fallback when neither of those set
+// anything. A plain first-party id with no gateway involved has nothing to
+// detect at any tier, so the segment is omitted in the common case.
 type providerSegment struct{}
 
 func (providerSegment) ID() string { return "provider" }
@@ -62,6 +67,8 @@ func providerIconKey(p modelid.Provider) string {
 		return theme.IconProviderAzure
 	case modelid.ProviderRouter:
 		return theme.IconProviderRouter
+	case modelid.ProviderGateway:
+		return theme.IconProviderGateway
 	default:
 		return ""
 	}

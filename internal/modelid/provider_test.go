@@ -64,6 +64,7 @@ func TestParseProvider(t *testing.T) {
 		{"gcp", "gcp", ProviderGCP, true},
 		{"azure", "azure", ProviderAzure, true},
 		{"router", "router", ProviderRouter, true},
+		{"gateway", "gateway", ProviderGateway, true},
 		{"uppercase", "AWS", ProviderAWS, true},
 		{"surrounding whitespace", "  gcp  ", ProviderGCP, true},
 		{"empty", "", "", false},

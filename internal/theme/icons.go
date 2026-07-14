@@ -52,6 +52,7 @@ const (
 	IconProviderGCP       = "provider_gcp"
 	IconProviderAzure     = "provider_azure"
 	IconProviderRouter    = "provider_router"
+	IconProviderGateway   = "provider_gateway"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -119,6 +120,7 @@ var Icons = map[string]Icon{
 	IconProviderGCP:       {Glyph: "\U000F11F6", Fallback: "GCP"},       // nf-md-google_cloud
 	IconProviderAzure:     {Glyph: "\U000F0805", Fallback: "Azure"},     // nf-md-microsoft_azure
 	IconProviderRouter:    {Glyph: "\U000F11E2", Fallback: "Router"},    // nf-md-router
+	IconProviderGateway:   {Glyph: "\U000F01D7", Fallback: "Gateway"},   // nf-md-domain
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,
