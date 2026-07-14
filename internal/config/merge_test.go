@@ -84,7 +84,7 @@ func TestMergeInto(t *testing.T) {
 		gitEnabledOff := false
 		base := Default()
 		overlay := Config{
-			Theme:    "nord",
+			Theme:    "light",
 			NerdFont: &nerdFontOff,
 			Git: GitConfig{
 				Enabled:    &gitEnabledOff,
@@ -95,8 +95,8 @@ func TestMergeInto(t *testing.T) {
 		}
 		mergeInto(&base, overlay)
 
-		if base.Theme != "nord" {
-			t.Errorf("Theme = %q, want nord", base.Theme)
+		if base.Theme != "light" {
+			t.Errorf("Theme = %q, want light", base.Theme)
 		}
 		if base.NerdFontEnabled() {
 			t.Error("NerdFontEnabled() = true, want false (overridden)")

@@ -16,16 +16,18 @@ import (
 var themeFS embed.FS
 
 // DefaultName is the theme used when none is configured, or when a
-// configured name doesn't match a built-in theme. claude-dark is a
-// reasonable default for the widest audience with zero config: most
-// terminals are dark, and it doesn't assume familiarity with any specific
-// developer color scheme the way gruvbox/nord/dracula/etc. do.
+// configured name doesn't match a built-in theme — the same fallback
+// internal/claudetheme uses when Claude Code's own theme can't be
+// determined, since "dark" is also Claude Code's own documented default.
 const DefaultName = "claude-dark"
 
-// names is the built-in theme list in a fixed display order (matching the
-// README's theme table), since a map (as LoadRegistry returns) has no
-// stable iteration order. DefaultName is listed first.
-var names = []string{"claude-dark", "claude-light", "gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula"}
+// names is the built-in theme list in a fixed display order, since a map
+// (as LoadRegistry returns) has no stable iteration order. DefaultName is
+// listed first. These are the only two built-in palettes: statusline
+// follows Claude Code's own dark/light theme setting (see
+// internal/claudetheme) rather than offering user-selectable aesthetic
+// themes.
+var names = []string{"claude-dark", "claude-light"}
 
 // Names returns the built-in theme names in a fixed, stable display order.
 func Names() []string {

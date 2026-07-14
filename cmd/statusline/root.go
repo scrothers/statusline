@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
 
+	"github.com/scrothers/statusline/internal/claudetheme"
 	"github.com/scrothers/statusline/internal/config"
 	"github.com/scrothers/statusline/internal/fallback"
 	"github.com/scrothers/statusline/internal/gitstatus"
@@ -43,7 +43,7 @@ func newRootCmd() *cobra.Command {
 	cmd.CompletionOptions.DisableDefaultCmd = true
 	cmd.SetVersionTemplate("statusline {{.Version}}\n")
 	cmd.Flags().StringVar(&configPath, "config", "", "path to a TOML config file (overrides discovery)")
-	cmd.Flags().StringVar(&themeName, "theme", "", "theme override: "+strings.Join(theme.Names(), ", "))
+	cmd.Flags().StringVar(&themeName, "theme", "", "theme override: dark, light (default: auto-detect from Claude Code)")
 	cmd.AddCommand(newDemoCmd())
 	return cmd
 }
@@ -86,6 +86,7 @@ func run(configPath, themeName string) {
 			cfg.Provider = p
 		}
 	}
+	cfg.Theme = "claude-" + resolveBase(cfg, payload)
 
 	th := resolveTheme(cfg)
 
@@ -110,6 +111,27 @@ func run(configPath, themeName string) {
 		output = fallback.Line(payload)
 	}
 	fmt.Println(output)
+}
+
+// resolveBase returns "dark" or "light": cfg.Theme (set from either a
+// config.toml `theme` key or the --theme flag) is a manual override when
+// it's exactly "dark" or "light", taking priority outright; otherwise the
+// base is auto-detected from Claude Code's own settings.json via
+// internal/claudetheme, which never fails hard.
+func resolveBase(cfg config.Config, payload *input.Payload) string {
+	if cfg.Theme == "dark" || cfg.Theme == "light" {
+		return cfg.Theme
+	}
+
+	projectDir := ""
+	if payload.Workspace != nil {
+		projectDir = payload.Workspace.ProjectDir
+	}
+	base, warnings := claudetheme.Resolve(projectDir)
+	for _, w := range warnings {
+		fmt.Fprintln(os.Stderr, w)
+	}
+	return base
 }
 
 // resolveTheme picks and applies overrides to the configured theme, falling

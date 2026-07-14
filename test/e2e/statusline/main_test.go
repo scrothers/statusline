@@ -38,7 +38,14 @@ func run(t *testing.T, stdin string, env []string, args ...string) (stdout strin
 	t.Helper()
 	cmd := exec.Command(binPath, args...)
 	cmd.Stdin = bytes.NewBufferString(stdin)
-	cmd.Env = append(os.Environ(), env...)
+	// Point CLAUDE_CONFIG_DIR at a fresh, empty temp dir by default so
+	// Claude Code theme auto-detection (internal/claudetheme) never reads
+	// the real developer machine's ~/.claude/settings.json — tests stay
+	// hermetic and deterministic. A test that wants to exercise real
+	// settings.json content passes its own CLAUDE_CONFIG_DIR in env, which
+	// wins: os/exec keeps the last occurrence of a duplicate env key.
+	baseEnv := append(os.Environ(), "CLAUDE_CONFIG_DIR="+t.TempDir())
+	cmd.Env = append(baseEnv, env...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
 	cmd.Stderr = os.Stderr
@@ -209,7 +216,7 @@ func TestE2E_version(t *testing.T) {
 
 func TestE2E_allThemesRenderCleanly(t *testing.T) {
 	payload := `{"model":{"display_name":"Opus"},"cwd":"/tmp","context_window":{"used_percentage":50},"session_id":"s3"}`
-	for _, name := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula", "claude-dark", "claude-light"} {
+	for _, name := range []string{"dark", "light"} {
 		t.Run(name, func(t *testing.T) {
 			out, code := run(t, payload, nil, "--theme", name)
 			if code != 0 {
@@ -222,6 +229,41 @@ func TestE2E_allThemesRenderCleanly(t *testing.T) {
 	}
 }
 
+// TestE2E_themeDetectedFromProjectSettings proves the Claude Code
+// settings.json detection wiring works through a real subprocess: no
+// --theme override, no user-level settings.json (CLAUDE_CONFIG_DIR points
+// at an empty dir), only a project-level .claude/settings.json setting
+// "theme": "light" for the directory named in workspace.project_dir. The
+// rendered model label's identity-text color must be claude-light's
+// (#3D3D3A → "61;61;58"), not claude-dark's (#E8E6DC → "232;230;220").
+func TestE2E_themeDetectedFromProjectSettings(t *testing.T) {
+	projectDir := t.TempDir()
+	if err := os.MkdirAll(filepath.Join(projectDir, ".claude"), 0o755); err != nil {
+		t.Fatalf("MkdirAll: %v", err)
+	}
+	settingsPath := filepath.Join(projectDir, ".claude", "settings.json")
+	if err := os.WriteFile(settingsPath, []byte(`{"theme": "light"}`), 0o600); err != nil {
+		t.Fatalf("write settings.json: %v", err)
+	}
+
+	payload := `{"model":{"display_name":"Opus"},"cwd":"/tmp",` +
+		`"workspace":{"current_dir":"/tmp","project_dir":"` + projectDir + `"},"session_id":"s12"}`
+	out, code := run(t, payload, nil)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "61;61;58") {
+		t.Errorf("output = %q, want the claude-light identity-text color (61;61;58)", out)
+	}
+	if strings.Contains(out, "232;230;220") {
+		t.Errorf("output = %q, should not contain the claude-dark identity-text color", out)
+	}
+}
+
+// TestE2E_unknownThemeFallsBackWithoutFailing exercises a --theme value
+// that isn't "dark" or "light": resolveBase treats it as unset and falls
+// through to Claude Code auto-detection, which itself falls back to
+// "dark" in run()'s isolated CLAUDE_CONFIG_DIR (no settings.json present).
 func TestE2E_unknownThemeFallsBackWithoutFailing(t *testing.T) {
 	payload := `{"model":{"display_name":"Opus"},"cwd":"/tmp","session_id":"s4"}`
 	out, code := run(t, payload, nil, "--theme", "not-a-real-theme")
@@ -252,7 +294,7 @@ func TestE2E_demoDefaultShowsAllThemes(t *testing.T) {
 	if code != 0 {
 		t.Errorf("exit code = %d, want 0", code)
 	}
-	for _, theme := range []string{"gruvbox", "catppuccin-mocha", "tokyo-night", "nord", "dracula", "claude-dark", "claude-light"} {
+	for _, theme := range []string{"claude-dark", "claude-light"} {
 		if !strings.Contains(out, theme) {
 			t.Errorf("demo output missing theme header %q:\n%s", theme, out)
 		}
@@ -263,7 +305,7 @@ func TestE2E_demoDefaultShowsAllThemes(t *testing.T) {
 }
 
 func TestE2E_demoSingleThemeAndScenario(t *testing.T) {
-	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "dracula", "--scenario", "minimal")
+	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "dark", "--scenario", "minimal")
 	if code != 0 {
 		t.Errorf("exit code = %d, want 0", code)
 	}
@@ -286,7 +328,7 @@ func TestE2E_demoUnknownScenarioErrors(t *testing.T) {
 }
 
 func TestE2E_demoNarrowScenarioDropsLowPriority(t *testing.T) {
-	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "gruvbox", "--scenario", "narrow")
+	out, code := run(t, "", []string{"NO_COLOR=1"}, "demo", "--theme", "dark", "--scenario", "narrow")
 	if code != 0 {
 		t.Errorf("exit code = %d, want 0", code)
 	}

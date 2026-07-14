@@ -3,6 +3,12 @@ package config
 // Config is the fully-resolved statusline configuration: the built-in
 // default with any user overlay merged on top.
 type Config struct {
+	// Theme manually forces the base palette to "dark" or "light" instead
+	// of auto-detecting it from Claude Code's own settings.json (see
+	// internal/claudetheme). Empty (the common case) or any other value
+	// means "auto-detect"; this is a narrow escape hatch for previewing or
+	// running the binary outside Claude Code, not a return to picking
+	// between named aesthetic themes.
 	Theme          string                   `toml:"theme"`
 	ThemeOverrides map[string]string        `toml:"theme_overrides"`
 	NerdFont       *bool                    `toml:"nerd_font"`

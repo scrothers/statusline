@@ -51,7 +51,7 @@ func TestLoad_explicitPathOverridesScalarAndMergesMaps(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
 	body := `
-theme = "nord"
+theme = "light"
 
 [theme_overrides]
 success = "#00ff00"
@@ -67,8 +67,8 @@ enabled = false
 	if len(warnings) != 0 {
 		t.Fatalf("Load() warnings = %v, want none", warnings)
 	}
-	if cfg.Theme != "nord" {
-		t.Errorf("Theme = %q, want nord", cfg.Theme)
+	if cfg.Theme != "light" {
+		t.Errorf("Theme = %q, want light", cfg.Theme)
 	}
 	if cfg.ThemeOverrides["success"] != "#00ff00" {
 		t.Errorf("ThemeOverrides[success] = %q, want #00ff00", cfg.ThemeOverrides["success"])
@@ -94,7 +94,7 @@ func TestLoad_explicitPathUnreadableWarnsAndFallsBack(t *testing.T) {
 
 	dir := t.TempDir()
 	path := filepath.Join(dir, "config.toml")
-	if err := os.WriteFile(path, []byte(`theme = "nord"`), 0o644); err != nil {
+	if err := os.WriteFile(path, []byte(`theme = "light"`), 0o644); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 	// os.Stat (which Load uses to check existence) doesn't require read
@@ -140,7 +140,7 @@ func TestLoad_xdgConfigHomeDiscovered(t *testing.T) {
 	t.Setenv("XDG_CONFIG_HOME", xdg)
 
 	path := filepath.Join(xdg, "statusline", "config.toml")
-	if err := os.WriteFile(path, []byte(`theme = "dracula"`), 0o644); err != nil {
+	if err := os.WriteFile(path, []byte(`theme = "light"`), 0o644); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 
@@ -148,8 +148,8 @@ func TestLoad_xdgConfigHomeDiscovered(t *testing.T) {
 	if len(warnings) != 0 {
 		t.Errorf("Load() warnings = %v, want none", warnings)
 	}
-	if cfg.Theme != "dracula" {
-		t.Errorf("Theme = %q, want dracula", cfg.Theme)
+	if cfg.Theme != "light" {
+		t.Errorf("Theme = %q, want light", cfg.Theme)
 	}
 }
 
@@ -160,7 +160,7 @@ func TestLoad_claudeConfigDiscoveredWhenNoXDG(t *testing.T) {
 		t.Fatalf("MkdirAll() error = %v", err)
 	}
 	path := filepath.Join(claudeDir, "statusline-config.toml")
-	if err := os.WriteFile(path, []byte(`theme = "tokyo-night"`), 0o644); err != nil {
+	if err := os.WriteFile(path, []byte(`theme = "light"`), 0o644); err != nil {
 		t.Fatalf("WriteFile() error = %v", err)
 	}
 
@@ -168,8 +168,8 @@ func TestLoad_claudeConfigDiscoveredWhenNoXDG(t *testing.T) {
 	if len(warnings) != 0 {
 		t.Errorf("Load() warnings = %v, want none", warnings)
 	}
-	if cfg.Theme != "tokyo-night" {
-		t.Errorf("Theme = %q, want tokyo-night", cfg.Theme)
+	if cfg.Theme != "light" {
+		t.Errorf("Theme = %q, want light", cfg.Theme)
 	}
 }
 
