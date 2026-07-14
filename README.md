@@ -115,21 +115,28 @@ instead of one flat color, so the tier you're running is visible at a
 glance; an id that doesn't decode to one of those five falls back to the
 theme's general identity accent.
 
-`provider` renders a small badge next to `model` (AWS/GCP/Azure/Router/Gateway
-icon) identifying which route the model traffic took, resolved in three
-tiers:
+`provider` renders a small badge next to `model`
+(AWS/GCP/Azure/Cloudflare/DigitalOcean/Router/Gateway icon) identifying
+which route the model traffic took, resolved in three tiers:
 
-1. An explicit `provider = "aws"`/`"gcp"`/`"azure"`/`"router"`/`"gateway"` in
-   config always wins.
+1. An explicit `provider = "aws"`/`"gcp"`/`"azure"`/`"cloudflare"`/
+   `"digitalocean"`/`"router"`/`"gateway"` in config always wins.
 2. Otherwise, Claude Code's own routing environment variables (inherited
    from the parent process) — `CLAUDE_CODE_USE_BEDROCK`/`ANTHROPIC_BEDROCK_*`/
    `ANTHROPIC_AWS_*` for AWS, `CLAUDE_CODE_USE_VERTEX`/`ANTHROPIC_VERTEX_*`
-   for GCP, `ANTHROPIC_FOUNDRY_*` for Azure, or a non-default
-   `ANTHROPIC_BASE_URL` for a generic corporate/self-hosted gateway. This is
-   the only reliable way to detect Azure or a bare corporate-relayed id —
-   neither carries any distinguishing shape in `model.id` itself (a gateway
-   that just relays a renamed id like `claude-4-8-opus` is structurally
-   identical to a legitimate legacy Anthropic id like `claude-3-opus`).
+   for GCP, `ANTHROPIC_FOUNDRY_*` for Azure, or the destination host of a
+   non-default `ANTHROPIC_BASE_URL` — matched against known gateway-product
+   domains (Cloudflare AI Gateway's `gateway.ai.cloudflare.com`, DigitalOcean's
+   `inference.do-ai.run`/`*.ondigitalocean.app`) before falling back to a
+   generic gateway badge for anything else. Host matching is a proper
+   dot-boundary suffix match on the parsed URL, not a raw substring search,
+   so a lookalike like `notcloudflare.com` or `api.anthropic.com.evil.example`
+   never false-positives. This env-var tier is the only reliable way to
+   detect Azure, Cloudflare, DigitalOcean, or a bare corporate-relayed id at
+   all — none of them carry any distinguishing shape in `model.id` itself (a
+   gateway that just relays a renamed id like `claude-4-8-opus` is
+   structurally identical to a legitimate legacy Anthropic id like
+   `claude-3-opus`).
 3. Last resort: the `model.id` shape itself — a Bedrock `anthropic.` prefix
    or ARN, a Vertex `@date` suffix or resource path, or a `vendor/model`
    prefix from an OpenRouter-style aggregator.
