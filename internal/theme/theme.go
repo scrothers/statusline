@@ -43,6 +43,17 @@ func Names() []string {
 type Theme struct {
 	Name                         string
 	IdentityAccent, IdentityText style.Color
+	// IdentityOpus, IdentitySonnet, IdentityHaiku, IdentityFable, and
+	// IdentityMythos are per-model-family accents for the model segment's
+	// icon. IdentityOpus is conventionally the same value as IdentityAccent
+	// (the flagship tier keeps the theme's existing look); the other four
+	// give each family a distinct, at-a-glance color. A family the model
+	// segment can't map to one of these (an unrecognized id, or the
+	// "Claude" fallback) uses IdentityAccent instead — see
+	// Theme.IdentityColorFor.
+	IdentityOpus, IdentitySonnet style.Color
+	IdentityHaiku, IdentityFable style.Color
+	IdentityMythos               style.Color
 	TextPrimary, TextSecondary   style.Color
 	Success, Warning, Danger     style.Color
 	Info, Muted                  style.Color
@@ -54,6 +65,11 @@ type rawTheme struct {
 	Colors struct {
 		IdentityAccent string `toml:"identity_accent"`
 		IdentityText   string `toml:"identity_text"`
+		IdentityOpus   string `toml:"identity_opus"`
+		IdentitySonnet string `toml:"identity_sonnet"`
+		IdentityHaiku  string `toml:"identity_haiku"`
+		IdentityFable  string `toml:"identity_fable"`
+		IdentityMythos string `toml:"identity_mythos"`
 		TextPrimary    string `toml:"text_primary"`
 		TextSecondary  string `toml:"text_secondary"`
 		Success        string `toml:"success"`
@@ -109,6 +125,11 @@ func (r rawTheme) resolve() (Theme, error) {
 		Name:           r.Name,
 		IdentityAccent: parse(r.Colors.IdentityAccent),
 		IdentityText:   parse(r.Colors.IdentityText),
+		IdentityOpus:   parse(r.Colors.IdentityOpus),
+		IdentitySonnet: parse(r.Colors.IdentitySonnet),
+		IdentityHaiku:  parse(r.Colors.IdentityHaiku),
+		IdentityFable:  parse(r.Colors.IdentityFable),
+		IdentityMythos: parse(r.Colors.IdentityMythos),
 		TextPrimary:    parse(r.Colors.TextPrimary),
 		TextSecondary:  parse(r.Colors.TextSecondary),
 		Success:        parse(r.Colors.Success),
@@ -145,6 +166,11 @@ func (t *Theme) tokenSetters() map[string]*style.Color {
 	return map[string]*style.Color{
 		"identity_accent": &t.IdentityAccent,
 		"identity_text":   &t.IdentityText,
+		"identity_opus":   &t.IdentityOpus,
+		"identity_sonnet": &t.IdentitySonnet,
+		"identity_haiku":  &t.IdentityHaiku,
+		"identity_fable":  &t.IdentityFable,
+		"identity_mythos": &t.IdentityMythos,
 		"text_primary":    &t.TextPrimary,
 		"text_secondary":  &t.TextSecondary,
 		"success":         &t.Success,
@@ -153,6 +179,29 @@ func (t *Theme) tokenSetters() map[string]*style.Color {
 		"info":            &t.Info,
 		"muted":           &t.Muted,
 		"track_dim":       &t.TrackDim,
+	}
+}
+
+// IdentityColorFor returns the accent color for a specific model family, as
+// decoded by modelid.Family (e.g. "Opus", "Sonnet"). Anything that isn't one
+// of the five known families — an unrecognized id, or the "Claude" fallback
+// modelid.Family returns for a recognizably-Claude id with no known family
+// word — falls back to the theme's general IdentityAccent, so callers never
+// need a separate nil/zero check.
+func (t Theme) IdentityColorFor(family string) style.Color {
+	switch family {
+	case "Opus":
+		return t.IdentityOpus
+	case "Sonnet":
+		return t.IdentitySonnet
+	case "Haiku":
+		return t.IdentityHaiku
+	case "Fable":
+		return t.IdentityFable
+	case "Mythos":
+		return t.IdentityMythos
+	default:
+		return t.IdentityAccent
 	}
 }
 

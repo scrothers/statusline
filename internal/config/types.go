@@ -10,6 +10,18 @@ type Config struct {
 	Segments       map[string]SegmentConfig `toml:"segments"`
 	Git            GitConfig                `toml:"git"`
 	Budget         BudgetConfig             `toml:"budget"`
+	// Provider forces the provider badge segment to a specific gateway
+	// ("aws", "gcp", "azure", "cloudflare", "digitalocean", "router", or
+	// "gateway") instead of auto-detecting. Auto-detection itself has two
+	// tiers: Claude Code's own routing environment variables (see
+	// DetectProviderFromEnv) are checked first — the only reliable way to
+	// detect Azure/Foundry, Cloudflare, DigitalOcean, or a bare
+	// corporate-relayed id, since none of them carry any distinguishing
+	// shape in the model id — then the model id's own shape as a last
+	// resort. This field is a manual override on top of both, not the only
+	// way any particular badge can appear. An unrecognized value is treated
+	// the same as unset (fall through to auto-detection).
+	Provider string `toml:"provider"`
 }
 
 // NerdFontEnabled reports whether Nerd Font glyphs should render, defaulting

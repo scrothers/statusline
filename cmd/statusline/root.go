@@ -77,6 +77,15 @@ func run(configPath, themeName string) {
 	if themeName != "" {
 		cfg.Theme = themeName
 	}
+	// An explicit config.toml `provider` always wins; otherwise, Claude
+	// Code's own routing env vars are a stronger signal than guessing from
+	// the model id, and the only way to detect Azure/Foundry or a bare
+	// corporate-relayed id at all — see providerSegment.
+	if cfg.Provider == "" {
+		if p, ok := config.DetectProviderFromEnv(); ok {
+			cfg.Provider = p
+		}
+	}
 
 	th := resolveTheme(cfg)
 

@@ -77,6 +77,85 @@ func TestE2E_fixturesAlwaysExitZeroAndPrint(t *testing.T) {
 	}
 }
 
+func TestE2E_gatewayModelIDDecodesOverDisplayName(t *testing.T) {
+	payload := `{"model":{"id":"claude-4-8-opus[1m]","display_name":"claude-4-8-opus[1m]"},` +
+		`"cwd":"/tmp","session_id":"s6"}`
+	out, code := run(t, payload, nil)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "Opus 4.8") {
+		t.Errorf("output = %q, want it to contain %q", out, "Opus 4.8")
+	}
+}
+
+func TestE2E_providerBadgeFallbackText(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	payload := `{"model":{"id":"anthropic.claude-opus-4-8","display_name":"anthropic.claude-opus-4-8"},` +
+		`"cwd":"/tmp","session_id":"s7"}`
+	out, code := run(t, payload, nil, "--config", configPath)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "AWS") {
+		t.Errorf("output = %q, want it to contain the AWS provider badge fallback", out)
+	}
+}
+
+func TestE2E_providerBadgeDetectedFromEnv(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	// A bare first-party-shaped id has no provider signal of its own — the
+	// gateway badge can only come from the env var, proving the detection
+	// actually wires through a real subprocess invocation end-to-end.
+	payload := `{"model":{"id":"claude-opus-4-8"},"cwd":"/tmp","session_id":"s8"}`
+	out, code := run(t, payload, []string{"ANTHROPIC_BASE_URL=https://llm-proxy.internal.example.com"}, "--config", configPath)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "Gateway") {
+		t.Errorf("output = %q, want it to contain the Gateway provider badge fallback", out)
+	}
+}
+
+func TestE2E_providerBadgeDetectsKnownGatewayProducts(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	tests := []struct {
+		name    string
+		baseURL string
+		want    string
+	}{
+		{"cloudflare ai gateway", "https://gateway.ai.cloudflare.com/v1/acct/gw/anthropic", "Cloudflare"},
+		{"digitalocean inference endpoint", "https://inference.do-ai.run", "DO"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			payload := `{"model":{"id":"claude-opus-4-8"},"cwd":"/tmp","session_id":"s9"}`
+			out, code := run(t, payload, []string{"ANTHROPIC_BASE_URL=" + tt.baseURL}, "--config", configPath)
+			if code != 0 {
+				t.Errorf("exit code = %d, want 0", code)
+			}
+			if !strings.Contains(out, tt.want) {
+				t.Errorf("output = %q, want it to contain %q", out, tt.want)
+			}
+		})
+	}
+}
+
 func TestE2E_version(t *testing.T) {
 	out, code := run(t, "", nil, "--version")
 	if code != 0 {

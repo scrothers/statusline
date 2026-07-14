@@ -38,6 +38,7 @@ type Segment interface {
 func Registry() map[string]Segment {
 	segments := []Segment{
 		modelSegment{},
+		providerSegment{},
 		directorySegment{},
 		gitSegment{},
 		contextWindowSegment{},

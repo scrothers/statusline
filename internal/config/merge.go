@@ -9,6 +9,9 @@ func mergeInto(base *Config, overlay Config) {
 	if overlay.Theme != "" {
 		base.Theme = overlay.Theme
 	}
+	if overlay.Provider != "" {
+		base.Provider = overlay.Provider
+	}
 	for k, v := range overlay.ThemeOverrides {
 		if base.ThemeOverrides == nil {
 			base.ThemeOverrides = make(map[string]string, len(overlay.ThemeOverrides))
