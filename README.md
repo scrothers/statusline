@@ -113,15 +113,29 @@ a line fits; model and directory never drop, only self-truncate.
 Mythos each get their own theme-defined accent (see [Themes](#themes))
 instead of one flat color, so the tier you're running is visible at a
 glance; an id that doesn't decode to one of those five falls back to the
-theme's general identity accent. `provider` renders a small badge next to
-`model` (AWS/GCP/Azure/Router icon) when the `model.id` shape reveals which
-gateway it was routed through — a Bedrock `anthropic.` prefix or ARN, a
-Vertex `@date` suffix or resource path, or a `vendor/model` prefix from an
-OpenRouter-style aggregator. It's silent for a plain first-party id, and it
-can't detect Microsoft Foundry/Azure at all — Azure deployment names carry
-no distinguishing shape, so that badge only ever appears via an explicit
-`provider = "azure"` in config (also accepts `"aws"`/`"gcp"`/`"router"` to
-force any badge over auto-detection).
+theme's general identity accent.
+
+`provider` renders a small badge next to `model` (AWS/GCP/Azure/Router/Gateway
+icon) identifying which route the model traffic took, resolved in three
+tiers:
+
+1. An explicit `provider = "aws"`/`"gcp"`/`"azure"`/`"router"`/`"gateway"` in
+   config always wins.
+2. Otherwise, Claude Code's own routing environment variables (inherited
+   from the parent process) — `CLAUDE_CODE_USE_BEDROCK`/`ANTHROPIC_BEDROCK_*`/
+   `ANTHROPIC_AWS_*` for AWS, `CLAUDE_CODE_USE_VERTEX`/`ANTHROPIC_VERTEX_*`
+   for GCP, `ANTHROPIC_FOUNDRY_*` for Azure, or a non-default
+   `ANTHROPIC_BASE_URL` for a generic corporate/self-hosted gateway. This is
+   the only reliable way to detect Azure or a bare corporate-relayed id —
+   neither carries any distinguishing shape in `model.id` itself (a gateway
+   that just relays a renamed id like `claude-4-8-opus` is structurally
+   identical to a legitimate legacy Anthropic id like `claude-3-opus`).
+3. Last resort: the `model.id` shape itself — a Bedrock `anthropic.` prefix
+   or ARN, a Vertex `@date` suffix or resource path, or a `vendor/model`
+   prefix from an OpenRouter-style aggregator.
+
+Silent when none of the three find anything, which is the common
+plain-first-party case.
 
 `effort` is the one segment colored by intensity rather than theme: its icon
 escalates from an empty gauge (`low`) through a full gauge (`xhigh`) to fire
