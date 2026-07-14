@@ -11,12 +11,13 @@
   <a href="LICENSE.md"><img src="https://img.shields.io/github/license/scrothers/statusline" alt="License"></a>
 </p>
 
-A single-binary, themeable [Claude Code statusLine](https://code.claude.com/docs/en/statusline)
+A single-binary [Claude Code statusLine](https://code.claude.com/docs/en/statusline)
 command written in Go. Flat, no-background segments joined by a thin Nerd
-Font chevron divider, truecolor gradients, seven built-in themes, and an
-optional TOML config file for anyone who wants to tweak it further.
+Font chevron divider, truecolor gradients, a palette that automatically
+follows Claude Code's own dark/light theme setting, and an optional TOML
+config file for anyone who wants to tweak it further.
 
-*(The image above is a real render — `statusline demo --theme claude-dark --scenario full` —
+*(The image above is a real render — `statusline demo --theme dark --scenario full` —
 captured as an image since GitHub can't render truecolor ANSI escape codes or
 Nerd Font glyphs inside a Markdown code block.)*
 
@@ -56,9 +57,9 @@ go install github.com/scrothers/statusline/cmd/statusline@latest
 craft JSON fixtures or wire up Claude Code first:
 
 ```sh
-./statusline demo                                   # "full" scenario, all 7 themes
-./statusline demo --theme dracula                    # one theme only
-./statusline demo --theme nord --scenario minimal    # early-session look
+./statusline demo                                   # "full" scenario, both dark and light
+./statusline demo --theme light                      # one base only
+./statusline demo --theme dark --scenario minimal    # early-session look
 ./statusline demo --scenario narrow --columns 40     # test width-based truncation
 ```
 
@@ -228,28 +229,74 @@ available.
 
 ## Themes
 
-Seven built-in themes, selected with `theme = "<name>"` in config or
-`--theme <name>` on the command line. `claude-dark` is the default. Themes
-are foreground-only palettes (identity accent + per-model-family identity
+statusline has no user-selectable aesthetic themes — it automatically
+follows **Claude Code's own** active theme, so it always visually matches
+what Claude Code itself is rendering with, no configuration required. There
+are two built-in palettes, `claude-dark` and `claude-light`; every other
+Claude Code theme preset collapses to whichever of the two it's based on.
+Palettes are foreground-only (identity accent + per-model-family identity
 accents (`identity_opus`/`identity_sonnet`/`identity_haiku`/`identity_fable`/
 `identity_mythos`) + success/warning/danger/info/muted roles) — there's no
 background token, since the statusline never paints one. Every color token,
 including the per-family ones, can be overridden individually via
 `[theme_overrides]` (see [Configuration](#configuration)).
 
-<p align="center">
-  <img src="docs/img/themes.png" alt="All seven built-in themes rendering the same full session" width="850">
-</p>
+### Detection
 
-| Name | Style |
+statusline reads Claude Code's own `settings.json` files directly — it
+never receives theme information from Claude Code's statusLine payload,
+since that JSON carries no color/theme field at all. Resolution follows
+Claude Code's own settings-scope precedence, narrowed to the scopes a
+separate process can see on disk:
+
+1. `<project>/.claude/settings.local.json`
+2. `<project>/.claude/settings.json` (`<project>` is the payload's
+   `workspace.project_dir`)
+3. `$CLAUDE_CONFIG_DIR/settings.json` (default `~/.claude/settings.json`)
+4. No `theme` key found anywhere → `dark`, Claude Code's own documented
+   default
+
+The first scope that sets a `theme` key wins outright — same as Claude
+Code's own "local overrides project overrides user" behavior. Each preset
+value maps to a base:
+
+| Claude Code `theme` value | statusline base |
 |---|---|
-| `claude-dark` | Anthropic's coral/terracotta accent on a warm near-black ink background (default) |
-| `claude-light` | The same coral/terracotta accent on a warm cream background — the one built-in theme meant for a light terminal |
-| `gruvbox` | Warm, retro, high-contrast |
-| `catppuccin-mocha` | Soft pastel-on-dark |
-| `tokyo-night` | Cool blues/purples on near-black |
-| `nord` | Arctic blues |
-| `dracula` | High-contrast purple/pink |
+| `dark`, `dark-daltonized`, `dark-ansi` | `claude-dark` |
+| `light`, `light-daltonized`, `light-ansi` | `claude-light` |
+| `auto` | best-effort — see below |
+| `custom:<slug>` | that theme's own `base` field (see below) |
+
+statusline always emits 24-bit truecolor, so the daltonized/ANSI-16
+variants currently render identically to their plain dark/light
+counterpart rather than shifting hues or downgrading to a 16-color
+palette — a possible future feature, not a silent gap today.
+
+`auto` (Claude Code's own terminal light/dark background detection) isn't
+exposed anywhere for another process to read, and Claude Code resolves it
+internally rather than persisting the answer. statusline approximates it
+best-effort via the `COLORFGBG` environment variable (set by many
+terminals and tmux configs) and falls back to `dark` when it's absent or
+unparsable — deliberately not a live terminal query, since statusline's
+stdout is piped to Claude Code rather than connected to the terminal, and
+probing `/dev/tty` directly would risk racing Claude Code's own terminal
+control on every render.
+
+`custom:<slug>` (a theme defined in `~/.claude/themes/<slug>.json`) is
+honored for its `base` field only — the light/dark choice — not its
+`overrides` color tokens, since those use color forms (`rgb(...)`,
+`ansi256(...)`, `ansi:<name>`) statusline doesn't parse. A
+`custom:<plugin>:<slug>` reference (a plugin-contributed theme, not a file
+under `~/.claude/themes/`) isn't resolvable from a settings read at all.
+Both cases fall back to `dark`.
+
+### Manual override
+
+`theme = "dark"` / `theme = "light"` in config, or `--theme dark|light` on
+the command line, force a specific base and skip detection entirely — for
+previewing, running the binary outside Claude Code, or overriding a wrong
+detection. Any other value is treated as unset (falls through to
+detection).
 
 `claude-dark` and `claude-light` are built from Anthropic's published brand
 palette (the `#D97757` coral, `#141413` ink, `#FAF9F5` cream, plus a sage
@@ -265,16 +312,16 @@ Optional TOML config file, discovered in this order (first match wins):
 1. `--config <path>` flag
 2. `$XDG_CONFIG_HOME/statusline/config.toml` (or `~/.config/statusline/config.toml`)
 3. `~/.claude/statusline-config.toml`
-4. Built-in defaults (Gruvbox theme, the 3-line layout above)
+4. Built-in defaults (auto-detected theme, the 3-line layout above)
 
 A missing or malformed config file is never fatal — it falls back to the
 built-in default and prints a warning to stderr (never stdout, which is
 reserved for the rendered statusline).
 
-Example overriding the theme and disabling one segment:
+Example forcing the theme and disabling one segment:
 
 ```toml
-theme = "nord"
+theme = "light"
 
 [segments.pr]
 enabled = false

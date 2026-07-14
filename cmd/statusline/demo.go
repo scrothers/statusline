@@ -34,7 +34,7 @@ func newDemoCmd() *cobra.Command {
 			return runDemo(themeName, scenarioName, columns)
 		},
 	}
-	cmd.Flags().StringVar(&themeName, "theme", "", "theme to preview (default: all built-in themes)")
+	cmd.Flags().StringVar(&themeName, "theme", "", "theme to preview: dark, light (default: both)")
 	cmd.Flags().StringVar(&scenarioName, "scenario", "full",
 		fmt.Sprintf("scenario to render: %s", strings.Join(demo.Names(), ", ")))
 	cmd.Flags().IntVar(&columns, "columns", 0, "override the scenario's terminal width (0 = scenario default)")
@@ -57,7 +57,7 @@ func runDemo(themeName, scenarioName string, columns int) error {
 
 	names := theme.Names()
 	if themeName != "" {
-		names = []string{themeName}
+		names = []string{"claude-" + themeName}
 	}
 
 	cfg := config.Default()
