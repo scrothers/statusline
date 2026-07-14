@@ -39,6 +39,7 @@ func Registry() map[string]Segment {
 	segments := []Segment{
 		modelSegment{},
 		providerSegment{},
+		billingSegment{},
 		directorySegment{},
 		gitSegment{},
 		contextWindowSegment{},

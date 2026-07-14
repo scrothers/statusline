@@ -98,7 +98,7 @@ joined by a thin chevron divider, not powerline pills.
 
 | Line | Segments | Notes |
 |---|---|---|
-| 1 — Claude | model, provider badge, thinking, effort, context window, rate limits (5h/7d), cache | The model's own state: what it's running, how hard, and how much room/budget is left. |
+| 1 — Claude | model, provider badge, billing badge, thinking, effort, context window, rate limits (5h/7d), cache | The model's own state: what it's running, how hard, and how much room/budget is left. |
 | 2 — session | session name, directory, lines added/removed, token counts, cost, duration | Omitted fields (no custom name, no diff yet) just don't appear. |
 | 3 — git | repo (host/owner/name), open PR (number + review state), branch + status, worktree | The whole line disappears outside a git repository. |
 
@@ -143,6 +143,16 @@ which route the model traffic took, resolved in three tiers:
 
 Silent when none of the three find anything, which is the common
 plain-first-party case.
+
+`billing` renders a small API-icon badge next to `provider` when the
+session is being metered per-token through the API rather than drawn
+against a Claude subscription plan. The payload's `rate_limits` object is
+populated only for Claude.ai subscribers, and only after their first API
+response in the session, so the badge fires on `cost` being present (proof
+a turn has already completed) while `rate_limits` is still absent —
+distinguishing genuine API billing from a subscriber's early-session window
+before their first rate-limit snapshot has arrived. Silent for subscription
+sessions and for a session with no completed turn yet.
 
 `effort` is the one segment colored by intensity rather than theme: its icon
 escalates from an empty gauge (`low`) through a full gauge (`xhigh`) to fire

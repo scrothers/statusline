@@ -55,6 +55,7 @@ const (
 	IconProviderGateway      = "provider_gateway"
 	IconProviderCloudflare   = "provider_cloudflare"
 	IconProviderDigitalOcean = "provider_digitalocean"
+	IconBillingAPI           = "billing_api"
 )
 
 // Icon pairs a Nerd Font glyph with a plain-Unicode/ASCII fallback for
@@ -125,6 +126,7 @@ var Icons = map[string]Icon{
 	IconProviderGateway:      {Glyph: "\U000F01D7", Fallback: "Gateway"},   // nf-md-domain
 	IconProviderCloudflare:   {Glyph: "\uE792", Fallback: "Cloudflare"},    // nf-dev-cloudflare
 	IconProviderDigitalOcean: {Glyph: "\uE7AE", Fallback: "DO"},            // nf-dev-digitalocean
+	IconBillingAPI:           {Glyph: "\U000F109B", Fallback: "API"},       // nf-md-api
 }
 
 // Glyph returns the icon for key: the Nerd Font glyph when nerdFont is true,
