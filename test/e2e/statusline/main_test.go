@@ -156,6 +156,47 @@ func TestE2E_providerBadgeDetectsKnownGatewayProducts(t *testing.T) {
 	}
 }
 
+func TestE2E_billingBadgeAPIMode(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	// Cost present with no rate_limits object at all is the shape Claude
+	// Code sends for an API-key-billed session — rate_limits only ever
+	// appears for Claude.ai subscribers, and only after their first API
+	// response, which Cost being present here already implies happened.
+	payload := `{"model":{"id":"claude-opus-4-8"},"cwd":"/tmp","session_id":"s10",` +
+		`"cost":{"total_cost_usd":0.42,"total_duration_ms":5000}}`
+	out, code := run(t, payload, nil, "--config", configPath)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "API") {
+		t.Errorf("output = %q, want it to contain the billing badge's API fallback", out)
+	}
+}
+
+func TestE2E_billingBadgeOmittedForSubscriptionSession(t *testing.T) {
+	dir := t.TempDir()
+	configPath := filepath.Join(dir, "config.toml")
+	if err := os.WriteFile(configPath, []byte("nerd_font = false\n"), 0o600); err != nil {
+		t.Fatalf("write config: %v", err)
+	}
+
+	payload := `{"model":{"id":"claude-opus-4-8"},"cwd":"/tmp","session_id":"s11",` +
+		`"cost":{"total_cost_usd":0.42,"total_duration_ms":5000},` +
+		`"rate_limits":{"five_hour":{"used_percentage":10,"resets_at":1}}}`
+	out, code := run(t, payload, nil, "--config", configPath)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if strings.Contains(out, "API") {
+		t.Errorf("output = %q, should not contain the billing badge when rate_limits is present", out)
+	}
+}
+
 func TestE2E_version(t *testing.T) {
 	out, code := run(t, "", nil, "--version")
 	if code != 0 {

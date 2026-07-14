@@ -30,9 +30,9 @@ type providerSegment struct{}
 
 func (providerSegment) ID() string { return "provider" }
 
-// Priority is the lowest of any segment: the provider badge is the most
-// supplementary signal on its line and should be the first thing dropped
-// under width pressure.
+// Priority is near the bottom of the range: the provider badge is a
+// supplementary signal on its line and should be dropped early under width
+// pressure, ahead of everything but billingSegment.
 func (providerSegment) Priority() int { return 15 }
 
 func (providerSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
