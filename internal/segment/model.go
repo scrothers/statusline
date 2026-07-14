@@ -1,6 +1,7 @@
 package segment
 
 import (
+	"github.com/scrothers/statusline/internal/modelid"
 	"github.com/scrothers/statusline/internal/style"
 	"github.com/scrothers/statusline/internal/theme"
 )
@@ -17,12 +18,16 @@ func (modelSegment) ID() string { return "model" }
 func (modelSegment) Priority() int { return 100 }
 
 func (modelSegment) Render(rc *RenderContext) ([]style.Chunk, bool) {
-	if rc.Payload.Model == nil || rc.Payload.Model.DisplayName == "" {
+	if rc.Payload.Model == nil {
+		return nil, false
+	}
+	label := modelid.Label(rc.Payload.Model.ID, rc.Payload.Model.DisplayName)
+	if label == "" {
 		return nil, false
 	}
 	icon := theme.Glyph(theme.IconModel, rc.Config.NerdFontEnabled())
 	return []style.Chunk{
 		{Text: icon, FG: rc.Theme.IdentityAccent},
-		{Text: " " + rc.Payload.Model.DisplayName, FG: rc.Theme.IdentityText},
+		{Text: " " + label, FG: rc.Theme.IdentityText},
 	}, true
 }

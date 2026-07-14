@@ -77,6 +77,18 @@ func TestE2E_fixturesAlwaysExitZeroAndPrint(t *testing.T) {
 	}
 }
 
+func TestE2E_gatewayModelIDDecodesOverDisplayName(t *testing.T) {
+	payload := `{"model":{"id":"claude-4-8-opus[1m]","display_name":"claude-4-8-opus[1m]"},` +
+		`"cwd":"/tmp","session_id":"s6"}`
+	out, code := run(t, payload, nil)
+	if code != 0 {
+		t.Errorf("exit code = %d, want 0", code)
+	}
+	if !strings.Contains(out, "Opus 4.8") {
+		t.Errorf("output = %q, want it to contain %q", out, "Opus 4.8")
+	}
+}
+
 func TestE2E_version(t *testing.T) {
 	out, code := run(t, "", nil, "--version")
 	if code != 0 {

@@ -30,4 +30,19 @@ func TestModelSegment(t *testing.T) {
 			t.Error("Render() ok = true, want false for nil Model")
 		}
 	})
+
+	t.Run("decodes a reordered gateway id over a garbled display name", func(t *testing.T) {
+		t.Parallel()
+		rc := newTestContext(t, &input.Payload{Model: &input.Model{
+			ID:          "claude-4-8-opus[1m]",
+			DisplayName: "claude-4-8-opus[1m]",
+		}}, nil)
+		chunks, ok := modelSegment{}.Render(rc)
+		if !ok {
+			t.Fatal("Render() ok = false, want true")
+		}
+		if !strings.Contains(chunkText(chunks), "Opus 4.8") {
+			t.Errorf("rendered text = %q, want it to contain %q", chunkText(chunks), "Opus 4.8")
+		}
+	})
 }

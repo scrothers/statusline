@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 
 	"github.com/scrothers/statusline/internal/input"
+	"github.com/scrothers/statusline/internal/modelid"
 )
 
 // Line returns a minimal, dependency-free statusline: just the model name
@@ -17,7 +18,7 @@ func Line(payload *input.Payload) string {
 
 	model := ""
 	if payload.Model != nil {
-		model = payload.Model.DisplayName
+		model = modelid.Label(payload.Model.ID, payload.Model.DisplayName)
 	}
 
 	dir := payload.CWD
